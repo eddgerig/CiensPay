@@ -1,6 +1,6 @@
-Universidad Central de Venezuela
-Facultad de Ciencias 
-Escuela de Computación
+Universidad Central de Venezuela |
+Facultad de Ciencias |
+Escuela de Computación |
 Asignatura: Comercio Electrónico
 
 # CIENSPAY
