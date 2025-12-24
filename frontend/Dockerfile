@@ -1,22 +1,22 @@
-# Usamos Node 22 como solicitaste
 FROM node:22-alpine
 
 WORKDIR /app
 
-# Instalamos Angular CLI globalmente dentro del contenedor
-RUN npm install -g @angular/cli@18.2.12
+# Asegura que los binarios locales estén en el PATH
+ENV PATH /app/node_modules/.bin:$PATH
+# Para que Create React App escuche en 0.0.0.0 y no intente abrir navegador
+ENV HOST 0.0.0.0
+ENV BROWSER none
 
-# Copiamos los archivos de dependencias
+# Copiamos package.json y package-lock.json e instalamos dependencias
 COPY package*.json ./
+RUN npm ci
 
-# Instalamos las dependencias del proyecto
-RUN npm install
-
-# Copiamos el código fuente
+# Copiamos el resto del código
 COPY . .
 
-# Exponemos el puerto por defecto de Angular
+# Puerto por defecto de CRA
 EXPOSE 4201
 
-# Iniciamos la aplicación permitiendo acceso externo (host 0.0.0.0)
-CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4201", "--poll", "2000"]
+# Comando de desarrollo
+CMD ["npm", "start"]

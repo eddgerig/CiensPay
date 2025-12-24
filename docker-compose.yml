@@ -1,29 +1,29 @@
 services:
-  # --- BACKEND (Django) ---
   backend:
     build: ./backend
     container_name: django_api
     command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
-      - ./backend:/app # Mapeo para ver cambios en tiempo real
+      - ./backend:/app
     ports:
       - "8000:8000"
     environment:
       - DEBUG=1
-    # SQLite es un archivo, gracias al volumen './backend:/app', 
-    # el archivo db.sqlite3 persistirá en tu carpeta local.
 
-    # --- FRONTEND (Angular) ---
   frontend:
     build: ./frontend
-    container_name: angular_client
+    container_name: react_client
     volumes:
       - ./frontend:/app
-      # Truco para evitar que node_modules del contenedor se sobrescriba con el local
-      - /app/node_modules
+      # Volumen nombrado para preservar node_modules creados en la imagen
+      - frontend_node_modules:/app/node_modules
     ports:
-      - "4201:4201"
+      - "3000:3000"
     depends_on:
       - backend
     environment:
-      - CHOKIDAR_USEPOLLING=true # Asegura hot-reload
+      - CHOKIDAR_USEPOLLING=true
+      - HOST=0.0.0.0
+volumes:
+  frontend_node_modules:
+    driver: local
