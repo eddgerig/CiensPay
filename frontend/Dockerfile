@@ -1,22 +1,20 @@
+# Usamos Node 22 como base
 FROM node:22-alpine
 
 WORKDIR /app
 
-# Asegura que los binarios locales estén en el PATH
-ENV PATH /app/node_modules/.bin:$PATH
-# Para que Create React App escuche en 0.0.0.0 y no intente abrir navegador
-ENV HOST 0.0.0.0
-ENV BROWSER none
-
-# Copiamos package.json y package-lock.json e instalamos dependencias
+# Copiamos los archivos de dependencias
 COPY package*.json ./
-RUN npm ci
+
+# Instalamos las dependencias
+RUN npm install
 
 # Copiamos el resto del código
 COPY . .
 
-# Puerto por defecto de CRA
-EXPOSE 4201
+# Vite usa por defecto el puerto 5173
+EXPOSE 5173
 
-# Comando de desarrollo
-CMD ["npm", "start"]
+# Iniciamos el servidor de desarrollo de Vite
+# --host 0.0.0.0 es necesario para que Docker pueda mapear el puerto
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
