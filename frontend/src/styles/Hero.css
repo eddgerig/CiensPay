@@ -1,0 +1,118 @@
+.hero-spinning-image {
+    width: 180px;
+    height: auto;
+    animation: spin-slow 20s linear infinite;
+    border-radius: 50%;
+    /* Ensure image is circular if needed */
+    position: relative;
+    z-index: 10;
+}
+
+.circuit-container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.circuit-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 1px dashed rgba(var(--primary-rgb), 0.3);
+    /* Assuming --primary-rgb allows this, otherwise use color */
+}
+
+/* Specific rings */
+.circuit-ring-1 {
+    width: 220px;
+    height: 220px;
+    /* Just outside image 180px */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid #d3ba30;
+    /* Primary color approximation or use variable */
+    animation: spin-reverse 15s linear infinite;
+}
+
+.circuit-ring-2 {
+    width: 260px;
+    height: 260px;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    animation: spin-slow 25s linear infinite;
+}
+
+.circuit-ring-3 {
+    width: 100%;
+    height: 100%;
+    border: 1px solid transparent;
+    border-left: 2px solid #d3ba30;
+    border-right: 2px solid #d3ba30;
+    border-radius: 50%;
+    animation: spin-pulse 10s ease-in-out infinite;
+}
+
+
+
+@keyframes circuit-pulse {
+    0% {
+        opacity: 0.8;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes spin-slow {
+    from {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+@keyframes spin-reverse {
+    from {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+
+    to {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+}
+
+@keyframes spin-pulse {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg) scale(1);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) rotate(180deg) scale(1.05);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg) scale(1);
+    }
+}
+
+/* Adjust spin-slow for the image which doesn't use translate */
+.hero-spinning-image {
+    animation: image-spin 20s linear infinite;
+}
+
+@keyframes image-spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
