@@ -16,7 +16,7 @@ export function Benefits() {
           <div className="relative order-2 md:order-1">
             <div className="absolute inset-0 bg-primary/10 rounded-3xl blur-2xl" />
             <ImageWithFallback
-              src="../../public/card.png"
+              src="/card.png"
               alt="Tarjeta CiensPay"
               className="relative z-10 w-300 h-300 rounded-3xl shadow-2xl"
             />
