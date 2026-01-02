@@ -134,13 +134,25 @@ export function Login({ onBack, onLoginSuccess }: LoginProps) {
                             style={{
                                 width: '3rem',
                                 height: '3rem',
-                                objectFit: 'contain'
+                                objectFit: 'contain',
+                                animation: 'spin 10s linear infinite'
                             }}
                         />
                         <span style={{ fontSize: '1.875rem', color: '#ffffff' }}>CiensPay</span>
                     </div>
 
-                    <h3 style={{ color: '#d3ba30' }} className="text-2xl text-white text-center mb-4  ">Iniciar Sesión</h3>
+                    <style>{`
+                        @keyframes spin {
+                            from {
+                                transform: rotate(0deg);
+                            }
+                            to {
+                                transform: rotate(360deg);
+                            }
+                        }
+                    `}</style>
+
+                    <h3 style={{ color: '#d3ba30' }} className="text-2xl text-white text-center mb-4 ">Iniciar Sesión</h3>
 
 
                     <form onSubmit={handleSubmit} className="space-y-6">
@@ -272,9 +284,9 @@ export function Login({ onBack, onLoginSuccess }: LoginProps) {
                             sx={{
                                 backgroundColor: '#d3ba30',
                                 color: '#000000',
-                                padding: '8px',
+                                padding: '6px',
                                 marginBottom: '1rem',
-                                fontSize: '1rem',
+                                fontSize: '0.9rem',
                                 textTransform: 'none',
                                 '&:hover': {
                                     backgroundColor: '#b39928',
