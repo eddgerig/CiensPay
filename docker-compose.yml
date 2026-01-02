@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   backend:
     build: ./backend
@@ -9,20 +11,29 @@ services:
       - "8000:8000"
     environment:
       - DEBUG=1
+      - BROWSER=none 
 
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: react_client
     stdin_open: true
     tty: true
     volumes:
       - ./frontend:/app
-      - frontend_node_modules:/app/node_modules
+      # Elimina esta línea o coméntala temporalmente:
+      # - frontend_node_modules:/app/node_modules
+      - /app/node_modules  # Esto crea un volumen anónimo
     ports:
       - "5173:5173"
+    environment:
+      - NODE_ENV=development
+    command: sh -c "npm install && npm run dev"
     depends_on:
       - backend
 
-volumes:
-  frontend_node_modules:
-    driver: local
+# Comenta o elimina esta sección temporalmente:
+# volumes:
+#   frontend_node_modules:
+#     driver: local
