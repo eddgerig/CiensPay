@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from './ui/button';
@@ -9,24 +10,26 @@ export function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-sm border-b border-primary/20">
       <nav className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <a href="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
 
             <img src="/CiensPay_logo.png" alt="CiensPay logo" className="h-12 w-auto object-contain" />
 
-          </a>
+          </Link>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-white/80 hover:text-primary transition-colors">
+            <a href="/#features" className="text-white/80 hover:text-primary transition-colors">
               Características
             </a>
-            <a href="#benefits" className="text-white/80 hover:text-primary transition-colors">
+            <a href="/#benefits" className="text-white/80 hover:text-primary transition-colors">
               Beneficios
             </a>
 
-            <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-black">
-              Iniciar Sesión
-            </Button>
+            <Link to="/login">
+              <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-black">
+                Iniciar Sesión
+              </Button>
+            </Link>
             <Button className="bg-primary text-black hover:bg-primary/90">
               Crear Cuenta
             </Button>
@@ -66,9 +69,11 @@ export function Header() {
               Seguridad
             </a>
             <div className="flex flex-col gap-2 pt-2">
-              <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-black w-full">
-                Iniciar Sesión
-              </Button>
+              <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-black w-full">
+                  Iniciar Sesión
+                </Button>
+              </Link>
               <Button className="bg-primary text-black hover:bg-primary/90 w-full">
                 Crear Cuenta
               </Button>
