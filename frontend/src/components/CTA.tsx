@@ -1,7 +1,9 @@
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Apple, Smartphone } from 'lucide-react';
 import { Button } from './ui/button';
 
 export function CTA() {
+  const navigate = useNavigate();
   return (
     <section className="py-24 bg-gradient-to-br from-primary/10 via-black to-black">
       <div className="container mx-auto px-4">
@@ -17,7 +19,11 @@ export function CTA() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-            <Button size="lg" className="bg-primary text-black hover:bg-primary/90 group">
+            <Button
+              size="lg"
+              className="bg-primary text-black hover:bg-primary/90 group"
+              onClick={() => navigate('/register')}
+            >
               Crear cuenta gratis
               <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
             </Button>

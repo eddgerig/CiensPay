@@ -30,9 +30,11 @@ export function Header() {
                 Iniciar Sesión
               </Button>
             </Link>
-            <Button className="bg-primary text-black hover:bg-primary/90">
-              Crear Cuenta
-            </Button>
+            <Link to="/register">
+              <Button className="bg-primary text-black hover:bg-primary/90">
+                Crear Cuenta
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -74,9 +76,11 @@ export function Header() {
                   Iniciar Sesión
                 </Button>
               </Link>
-              <Button className="bg-primary text-black hover:bg-primary/90 w-full">
-                Crear Cuenta
-              </Button>
+              <Link to="/register" onClick={() => setMobileMenuOpen(false)}>
+                <Button className="bg-primary text-black hover:bg-primary/90 w-full">
+                  Crear Cuenta
+                </Button>
+              </Link>
             </div>
           </div>
         )}
