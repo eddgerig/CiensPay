@@ -286,7 +286,7 @@ export function Login({ onBack, onLoginSuccess }: LoginProps) {
                                 color: '#000000',
                                 padding: '6px',
                                 marginBottom: '1rem',
-                                fontSize: '0.9rem',
+                                fontSize: '0.9  rem',
                                 textTransform: 'none',
                                 '&:hover': {
                                     backgroundColor: '#b39928',
@@ -315,9 +315,13 @@ export function Login({ onBack, onLoginSuccess }: LoginProps) {
                     <div className="mt-8 text-center">
                         <p className="text-white/60">
                             ¿No tienes cuenta?{' '}
-                            <a href="#" className="text-primary hover:underline">
+                            <button
+                                onClick={() => navigate('/register')}
+                                className="text-primary hover:underline bg-transparent border-none cursor-pointer"
+                                style={{ color: '#d3ba30' }}
+                            >
                                 Regístrate gratis
-                            </a>
+                            </button>
                         </p>
                     </div>
                 </div>
