@@ -1,0 +1,16 @@
+[Unit]
+Description=Gunicorn instance to serve CiensPay Backend
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/cienspay-backend
+ExecStart=/home/ubuntu/cienspay-backend/venv/bin/gunicorn \
+          --access-logfile - \
+          --workers 3 \
+          --bind unix:/home/ubuntu/cienspay-backend/cienspay.sock \
+          config.wsgi:application
+
+[Install]
+WantedBy=multi-user.target

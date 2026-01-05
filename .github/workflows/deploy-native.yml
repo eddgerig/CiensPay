@@ -1,0 +1,73 @@
+name: Deploy Native (No Docker)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          
+      - name: Install and Build
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+          
+      - name: Deploy Frontend to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          source: "frontend/dist/*"
+          target: "/var/www/cienspay-frontend"
+          strip_components: 2
+
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy Backend Code to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          source: "backend/*"
+          target: "/home/ubuntu/cienspay-backend"
+          strip_components: 1
+          
+      - name: SSH Remote Commands
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd /home/ubuntu/cienspay-backend
+            
+            # Crear venv si no existe
+            if [ ! -d "venv" ]; then
+              python3 -m venv venv
+            fi
+            
+            # Activar venv e instalar deps
+            source venv/bin/activate
+            pip install -r requirements.txt
+            
+            # Migraciones y Static Files
+            python manage.py migrate
+            python manage.py collectstatic --noinput
+            
+            # Reiniciar servicio
+            sudo systemctl restart cienspay-backend
