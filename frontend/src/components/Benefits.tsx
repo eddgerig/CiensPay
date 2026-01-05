@@ -1,5 +1,5 @@
 import { Check } from 'lucide-react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { CiensPayCard } from './CiensPayCard';
 
 const benefits = [
   'Sin comisiones mensuales de mantenimiento',
@@ -10,16 +10,14 @@ const benefits = [
 
 export function Benefits() {
   return (
-    <section id="benefits" className="py-24 bg-secondary">
+    <section id="benefits" className="py-50 bg-secondary">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="relative order-2 md:order-1">
-            <div className="absolute inset-0 bg-primary/10 rounded-3xl blur-2xl" />
-            <ImageWithFallback
-              src="../../public/card.png"
-              alt="Tarjeta CiensPay"
-              className="relative z-10 w-300 h-300 rounded-3xl shadow-2xl"
-            />
+          <div className="relative order-2 md:order-1 flex justify-center">
+            <div className="absolute inset-0 bg-primary/10 rounded-3xl blur-2xl scale-90" />
+            <div className="relative z-10 w-full max-w-md transform hover:scale-105 transition-transform duration-500">
+              <CiensPayCard isStatic />
+            </div>
           </div>
 
           <div className="space-y-6 order-1 md:order-2">
