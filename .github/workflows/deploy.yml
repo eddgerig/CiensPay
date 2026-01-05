@@ -23,14 +23,15 @@ jobs:
           target: "~/react-app"
 
       - name: SSH and build/run Docker on EC2
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          script: |
-            cd ~/react-app
-            docker build -t react-app:latest .
-            docker stop react-app || true
-            docker rm react-app || true
-            docker run -d --name react-app -p 80:80 react-app:latest
+  uses: appleboy/ssh-action@v0.1.7
+  with:
+    host: ${{ secrets.EC2_HOST }}
+    username: ${{ secrets.EC2_USER }}
+    key: ${{ secrets.EC2_KEY }}
+    script: |
+      cd ~/react-app          # Entramos en la carpeta donde se copió frontend
+      cd frontend             # Entramos en la subcarpeta donde está Dockerfile
+      docker build -t react-app:latest .
+      docker stop react-app || true
+      docker rm react-app || true
+      docker run -d --name react-app -p 80:80 react-app:latest
