@@ -1,0 +1,90 @@
+[
+    {
+        "id": 1,
+        "name": "Netflix Subscription",
+        "amount": -12.99,
+        "date": "3 Ene 2026",
+        "time": "10:30 AM",
+        "type": "expense",
+        "icon": "🎬",
+        "status": "completed",
+        "category": "Entretenimiento"
+    },
+    {
+        "id": 2,
+        "name": "Salario Mensual",
+        "amount": 3500.00,
+        "date": "1 Ene 2026",
+        "time": "08:00 AM",
+        "type": "income",
+        "icon": "💰",
+        "status": "completed",
+        "category": "Salario"
+    },
+    {
+        "id": 3,
+        "name": "Amazon Purchase",
+        "amount": -89.99,
+        "date": "31 Dic 2025",
+        "time": "03:45 PM",
+        "type": "expense",
+        "icon": "📦",
+        "status": "completed",
+        "category": "Compras"
+    },
+    {
+        "id": 4,
+        "name": "Transferencia de Juan Pérez",
+        "amount": 250.00,
+        "date": "30 Dic 2025",
+        "time": "11:20 AM",
+        "type": "income",
+        "icon": "💸",
+        "status": "completed",
+        "category": "Transferencia"
+    },
+    {
+        "id": 5,
+        "name": "Spotify Premium",
+        "amount": -9.99,
+        "date": "29 Dic 2025",
+        "time": "09:15 AM",
+        "type": "expense",
+        "icon": "🎵",
+        "status": "completed",
+        "category": "Entretenimiento"
+    },
+    {
+        "id": 6,
+        "name": "Supermercado Central",
+        "amount": -145.50,
+        "date": "28 Dic 2025",
+        "time": "06:30 PM",
+        "type": "expense",
+        "icon": "🛒",
+        "status": "completed",
+        "category": "Alimentos"
+    },
+    {
+        "id": 7,
+        "name": "Pago Freelance",
+        "amount": 800.00,
+        "date": "27 Dic 2025",
+        "time": "02:00 PM",
+        "type": "income",
+        "icon": "💼",
+        "status": "completed",
+        "category": "Freelance"
+    },
+    {
+        "id": 8,
+        "name": "Gasolina Shell",
+        "amount": -45.00,
+        "date": "26 Dic 2025",
+        "time": "08:45 AM",
+        "type": "expense",
+        "icon": "⛽",
+        "status": "completed",
+        "category": "Transporte"
+    }
+]

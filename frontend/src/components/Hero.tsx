@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -5,6 +6,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import '../styles/Hero.css';
 
 export function Hero() {
+  const navigate = useNavigate();
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
       {/* Background gradient */}
@@ -28,7 +30,11 @@ export function Hero() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-primary text-black hover:bg-primary/90 group">
+              <Button
+                size="lg"
+                className="bg-primary text-black hover:bg-primary/90 group"
+                onClick={() => navigate('/register')}
+              >
                 Comenzar ahora
                 <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
               </Button>
