@@ -34,10 +34,7 @@ jobs:
           script: |
             # Entrar a la carpeta donde se copió frontend
             cd ~/react-app/frontend
-
-            # Opcional: habilitar BuildKit para evitar warning
-            export DOCKER_BUILDKIT=1
-
+            
             # Construir la imagen Docker
             docker build -t react-app:latest .
 
