@@ -23,6 +23,7 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           source: "frontend/"
           target: "~/react-app"
+          timeout: 3600
 
       # 3️⃣ Conectarse a EC2 y construir/ejecutar Docker
       - name: SSH and build/run Docker on EC2
