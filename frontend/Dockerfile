@@ -1,16 +1,14 @@
-FROM node:18-alpine
-
+# 1️⃣ Build stage
+FROM node:18 as build
 WORKDIR /app
-
-# Instalar xdg-utils si realmente necesitas abrir navegador (opcional)
-# RUN apk add --no-cache xdg-utils
-
 COPY package*.json ./
-
 RUN npm install
-
 COPY . .
+RUN npm run build
 
-EXPOSE 5173
-
-CMD ["npm", "run", "dev"]
+# 2️⃣ Production stage con Nginx
+FROM nginx:alpine
+COPY --from=build /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
