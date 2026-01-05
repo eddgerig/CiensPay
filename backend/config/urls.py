@@ -14,9 +14,42 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
+
+"""from django.contrib import admin
 from django.urls import path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+]
+"""
+from django.contrib import admin
+from django.urls import path
+from django.http import JsonResponse  # Agrega esta línea
+
+# --- ELIMINA ESTA LÍNCA ---
+# from apps.api.views import health_check, api_info
+
+# --- REEMPLÁZALA CON ESTAS VISTAS DIRECTAMENTE ---
+def health_check(request):
+    return JsonResponse({
+        'status': 'healthy',
+        'service': 'CiensPay Backend',
+        'message': 'Backend funcionando correctamente',
+        'endpoint': '/api/health/'
+    })
+
+def api_info(request):
+    return JsonResponse({
+        'name': 'CiensPay API',
+        'version': '1.0.0',
+        'endpoints': {
+            'health': '/api/health/',
+            'info': '/api/info/'
+        }
+    })
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/health/', health_check, name='health-check'),
+    path('api/info/', api_info, name='api-info'),
 ]

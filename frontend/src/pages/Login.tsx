@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { TextField, Button, IconButton, InputAdornment } from '@mui/material';
 import { Eye, EyeOff, X, Mail, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import {authAPI} from '../api/auth';
+import * as React from 'react';
 
 interface LoginProps {
     onBack?: () => void;
@@ -14,6 +16,7 @@ export function Login({ onBack, onLoginSuccess }: LoginProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({ email: '', password: '' });
+    const [formData, setFormData] = useState({ email: '', password: '' });
     const [isLoading, setIsLoading] = useState(false);
 
     const validateEmail = (email: string) => {
@@ -22,7 +25,9 @@ export function Login({ onBack, onLoginSuccess }: LoginProps) {
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+        console.log("formData");
+        console.log(formData);
+        /*e.preventDefault();
 
         // Reset errors
         setErrors({ email: '', password: '' });
@@ -61,7 +66,27 @@ export function Login({ onBack, onLoginSuccess }: LoginProps) {
             } else {
                 navigate('/');
             }
-        }, 1500);
+        }, 1500);*/
+            e.preventDefault();
+        //setLoading(true);
+       /// setError('');
+
+        try {
+        const response = await authAPI.login(formData);
+        const { access, refresh } = response.data;
+        
+        // Guardar tokens
+        localStorage.setItem('access_token', access);
+        localStorage.setItem('refresh_token', refresh);
+        
+        // Redirigir al dashboard
+        console.log('Login exitoso');
+        //navigate('/dashboard');
+        } catch (err) {
+        //setError(err.response?.data?.detail || 'Error al iniciar sesión');
+        } finally {
+        //setLoading(false);
+        }
     };
 
     return (
@@ -162,8 +187,8 @@ export function Login({ onBack, onLoginSuccess }: LoginProps) {
                                 fullWidth
                                 type="email"
                                 label="Email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                value={formData.email}
+                                onChange={(e) => setFormData({...formData, email: e.target.value})}
                                 error={!!errors.email}
                                 helperText={errors.email}
                                 InputProps={{
@@ -214,8 +239,8 @@ export function Login({ onBack, onLoginSuccess }: LoginProps) {
                                 fullWidth
                                 type={showPassword ? 'text' : 'password'}
                                 label="Contraseña"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                value={formData.password}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, password: e.target.value})}
                                 error={!!errors.password}
                                 helperText={errors.password}
                                 InputProps={{
