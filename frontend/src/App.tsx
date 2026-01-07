@@ -3,7 +3,8 @@ import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
-
+import TestConnection from "./pages/TestConnection";
+import React from 'react';
 function RegisterWrapper() {
   const navigate = useNavigate();
   return (
@@ -41,6 +42,7 @@ export default function App() {
         <Route path="/login" element={<LoginWrapper />} />
         <Route path="/register" element={<RegisterWrapper />} />
         <Route path="/dashboard" element={<DashboardWrapper />} />
+        <Route path="/test-connection" element={<TestConnection />} />
       </Routes>
     </BrowserRouter>
   );
