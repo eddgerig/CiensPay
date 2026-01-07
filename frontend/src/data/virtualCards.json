@@ -1,0 +1,35 @@
+[
+    {
+        "id": 1,
+        "userId": 1,
+        "userName": "Juan Pérez",
+        "documentNumber": "12345678",
+        "cardNumber": "5123 4567 8901 2345",
+        "status": "active",
+        "expiryDate": "12/26",
+        "limit": 50000,
+        "assignedDate": "15 Dic 2025"
+    },
+    {
+        "id": 2,
+        "userId": 2,
+        "userName": "María González",
+        "documentNumber": "23456789",
+        "cardNumber": "5123 4567 8901 3456",
+        "status": "active",
+        "expiryDate": "01/27",
+        "limit": 100000,
+        "assignedDate": "18 Dic 2025"
+    },
+    {
+        "id": 3,
+        "userId": 5,
+        "userName": "Ana Martínez",
+        "documentNumber": "45678901",
+        "cardNumber": "5123 4567 8901 4567",
+        "status": "blocked",
+        "expiryDate": "11/26",
+        "limit": 50000,
+        "assignedDate": "10 Dic 2025"
+    }
+]

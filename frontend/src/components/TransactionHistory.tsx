@@ -1,8 +1,22 @@
-import { Card, CardContent } from '@mui/material';
+import { useState } from 'react';
+import { Card, CardContent, TablePagination } from '@mui/material';
 import { Filter, Download } from 'lucide-react';
 import recentTransactions from '../data/recentTransactions.json';
 
 export function TransactionHistory() {
+    const [page, setPage] = useState(0);
+    const rowsPerPage = 6;
+
+    const handleChangePage = (_event: unknown, newPage: number) => {
+        setPage(newPage);
+    };
+
+    // Calculate pagination
+    const paginatedTransactions = recentTransactions.slice(
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage
+    );
+
     return (
         <Card
             sx={{
@@ -10,9 +24,18 @@ export function TransactionHistory() {
                 backdropFilter: 'blur(10px)',
                 border: '1px solid rgba(211, 186, 48, 0.1)',
                 borderRadius: '20px',
+                height: 'calc(100vh - 140px)', // Occupy viewport height
+                display: 'flex',
+                flexDirection: 'column',
             }}
         >
-            <CardContent sx={{ padding: '32px' }}>
+            <CardContent sx={{
+                padding: '32px',
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden'
+            }}>
                 <div className="flex items-center justify-between mb-6">
                     <h3 className="text-xl text-white">Historial de Transacciones</h3>
                     <div className="flex items-center gap-3">
@@ -25,15 +48,15 @@ export function TransactionHistory() {
                     </div>
                 </div>
 
-                <div className="space-y-2">
-                    {recentTransactions.map((transaction) => (
+                <div className="space-y-2 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                    {paginatedTransactions.map((transaction) => (
                         <div
                             key={transaction.id}
                             className="flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 rounded-lg transition-all cursor-pointer group border border-transparent hover:border-primary/20"
                         >
-                            <div className="flex flex-col gap-1">
+                            <div className="flex flex-row items-center gap-3">
                                 <p className="text-primary text-sm font-medium">{transaction.name}</p>
-                                <p className=" text-xs text-white">{transaction.date}</p>
+                                <p className="text-xs text-white/60">{transaction.date}</p>
                             </div>
 
                             <p
@@ -46,9 +69,32 @@ export function TransactionHistory() {
                     ))}
                 </div>
 
-                <button className="w-full mt-6 py-3 text-primary hover:bg-primary/10 rounded-xl transition-colors">
-                    Ver todas las transacciones
-                </button>
+                <TablePagination
+                    component="div"
+                    count={recentTransactions.length}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    rowsPerPage={rowsPerPage}
+                    rowsPerPageOptions={[6]}
+                    labelRowsPerPage=""
+                    sx={{
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        '.MuiTablePagination-select': {
+                            display: 'none',
+                        },
+                        '.MuiTablePagination-selectLabel': {
+                            display: 'none',
+                        },
+                        '.MuiTablePagination-selectIcon': {
+                            display: 'none',
+                        },
+                        '.MuiTablePagination-actions': {
+                            color: 'white',
+                        },
+                        marginTop: '16px',
+                        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                    }}
+                />
             </CardContent>
         </Card>
     );

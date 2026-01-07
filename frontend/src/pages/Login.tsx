@@ -56,10 +56,17 @@ export function Login({ onBack, onLoginSuccess }: LoginProps) {
         setIsLoading(true);
         setTimeout(() => {
             setIsLoading(false);
+
+            // Check if admin
+            if (email === 'admin@cienspay.com' && password === 'admin123') {
+                navigate('/admin-dashboard');
+                return;
+            }
+
             if (onLoginSuccess) {
                 onLoginSuccess();
             } else {
-                navigate('/');
+                navigate('/dashboard');
             }
         }, 1500);
     };
