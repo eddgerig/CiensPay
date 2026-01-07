@@ -14,7 +14,7 @@ const api = axios.create({
 // Interceptor para logging (solo en desarrollo)
 api.interceptors.request.use(
   (config) => {
-    console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
+    console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, config.data || '');
     return config;
   },
   (error) => {

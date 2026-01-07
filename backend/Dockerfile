@@ -3,6 +3,11 @@ FROM python:3.11-slim
 
 # Directorio de trabajo dentro del contenedor
 WORKDIR /app
+# Instalar dependencias del sistema
+RUN apt-get update && apt-get install -y \
+    curl \
+    sqlite3 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Variables de entorno para evitar archivos .pyc y logs en buffer
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -11,6 +16,9 @@ ENV PYTHONUNBUFFERED=1
 # Instalar dependencias
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Crear directorio para la base de datos
+RUN mkdir -p /app/db
 
 # Copiar el resto del código
 COPY . .

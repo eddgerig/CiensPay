@@ -5,6 +5,7 @@ import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
 import TestConnection from "./pages/TestConnection";
 import React from 'react';
+import CreateForm from "./components/CreateForm";
 function RegisterWrapper() {
   const navigate = useNavigate();
   return (
@@ -43,6 +44,7 @@ export default function App() {
         <Route path="/register" element={<RegisterWrapper />} />
         <Route path="/dashboard" element={<DashboardWrapper />} />
         <Route path="/test-connection" element={<TestConnection />} />
+        <Route path="/test-connection2" element={<CreateForm />} />
       </Routes>
     </BrowserRouter>
   );

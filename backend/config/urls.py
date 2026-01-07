@@ -25,6 +25,10 @@ from django.contrib import admin
 from django.urls import path
 from django.http import JsonResponse  # Agrega esta línea
 
+from api.views import (
+    productos_list, producto_detail,
+    usuarios_list, crear_registro_simple
+)
 # --- ELIMINA ESTA LÍNCA ---
 # from apps.api.views import health_check, api_info
 
@@ -33,8 +37,8 @@ def health_check(request):
     return JsonResponse({
         'status': 'healthy',
         'service': 'CiensPay Backend',
-        'message': 'Backend funcionando correctamente',
-        'endpoint': '/api/health/'
+        'message': 'Backend funcionando correctamente'
+   
     })
 
 def api_info(request):
@@ -43,7 +47,10 @@ def api_info(request):
         'version': '1.0.0',
         'endpoints': {
             'health': '/api/health/',
-            'info': '/api/info/'
+            'info': '/api/info/',
+            'productos': '/api/productos/',
+            'usuarios': '/api/usuarios/',
+            'crear_simple': '/api/crear-simple/'
         }
     })
 
@@ -51,4 +58,14 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/health/', health_check, name='health-check'),
     path('api/info/', api_info, name='api-info'),
+        
+    # CRUD Productos
+    path('api/productos/', productos_list, name='productos-list'),
+    path('api/productos/<int:pk>/', producto_detail, name='producto-detail'),
+    
+    # CRUD Usuarios
+    path('api/usuarios/', usuarios_list, name='usuarios-list'),
+    
+    # Endpoint simple POST
+    path('api/crear-simple/', crear_registro_simple, name='crear-simple'),
 ]
