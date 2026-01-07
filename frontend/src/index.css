@@ -4,3 +4,15 @@
   --color-primary: #d3ba30;
   --color-red: #ff0000;
 }
+
+@layer base {
+  body {
+    @apply bg-black text-white;
+  }
+}
+
+/* Hide default password reveal button in Edge/IE */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
