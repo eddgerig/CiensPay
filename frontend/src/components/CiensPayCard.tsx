@@ -46,7 +46,7 @@ export function CiensPayCard({
                 margin: '0 auto',
             }}
         >
-            <CardContent sx={{ padding: '28px 32px' }}>
+            <CardContent sx={{ padding: '24px 32px' }}>
                 {/* Circuit pattern background */}
                 <div className="absolute inset-0 opacity-10">
                     <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -66,7 +66,7 @@ export function CiensPayCard({
                 </div>
 
                 {/* Header Section */}
-                <div className="relative flex items-start justify-between mb-8">
+                <div className="relative flex items-start justify-between mb-6">
                     {/* Logo */}
                     <div className="flex items-center gap-3">
                         <img
@@ -101,7 +101,7 @@ export function CiensPayCard({
                     </div>
                 </div>
 
-                <div className="relative mb-6">
+                <div className="relative mb-5">
                     <svg width="50" height="40" viewBox="0 0 50 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-14 h-10">
                         <rect width="50" height="40" rx="6" fill="url(#chip-gradient)" />
                         <path d="M0 13H15M35 13H50M0 27H15M35 27H50M25 0V40M15 13C15 13 18 13 18 20C18 27 15 27 15 27M35 13C35 13 32 13 32 20C32 27 35 27 35 27" stroke="#1a1a1a" strokeWidth="1" strokeOpacity="0.3" />
@@ -116,10 +116,10 @@ export function CiensPayCard({
                 </div>
 
                 {/* Card Number */}
-                <div className="relative mb-6">
+                <div className="relative mb-5">
                     {showCardDetails || isStatic ? (
                         <div className="flex items-center gap-3">
-                            <p className="text-gray-400 text-xl tracking-[0.3em] font-mono">{cardNumber}</p>
+                            <p className="text-gray-400 text-lg tracking-[0.3em] font-mono">{cardNumber}</p>
                             {!isStatic && (
                                 <IconButton
                                     size="small"
@@ -131,7 +131,7 @@ export function CiensPayCard({
                             )}
                         </div>
                     ) : (
-                        <p className="text-gray-400 text-xl tracking-[0.3em] font-mono">•••• •••• •••• {cardNumber.slice(-4)}</p>
+                        <p className="text-gray-400 text-lg tracking-[0.3em] font-mono">•••• •••• •••• {cardNumber.slice(-4)}</p>
                     )}
                 </div>
 

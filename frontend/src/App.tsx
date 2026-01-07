@@ -3,6 +3,7 @@ import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
+import { AdminDashboard } from './pages/AdminDashboard';
 import TestConnection from "./pages/TestConnection";
 import React from 'react';
 import CreateForm from "./components/CreateForm";
@@ -35,6 +36,15 @@ function DashboardWrapper() {
   );
 }
 
+function AdminDashboardWrapper() {
+  const navigate = useNavigate();
+  return (
+    <AdminDashboard
+      onLogout={() => navigate('/login')}
+    />
+  );
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -43,6 +53,7 @@ export default function App() {
         <Route path="/login" element={<LoginWrapper />} />
         <Route path="/register" element={<RegisterWrapper />} />
         <Route path="/dashboard" element={<DashboardWrapper />} />
+        <Route path="/admin-dashboard" element={<AdminDashboardWrapper />} />
         <Route path="/test-connection" element={<TestConnection />} />
         <Route path="/test-connection2" element={<CreateForm />} />
       </Routes>

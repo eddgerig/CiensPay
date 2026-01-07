@@ -1,0 +1,62 @@
+[
+    {
+        "id": 1,
+        "documentType": "V",
+        "documentNumber": "12345678",
+        "fullName": "Juan Pérez",
+        "email": "juan.perez@email.com",
+        "phone": "04241234567",
+        "status": "active",
+        "registrationDate": "15 Dic 2025",
+        "hasCard": true,
+        "balance": 12847.50
+    },
+    {
+        "id": 2,
+        "documentType": "V",
+        "documentNumber": "23456789",
+        "fullName": "María González",
+        "email": "maria.gonzalez@email.com",
+        "phone": "04129876543",
+        "status": "active",
+        "registrationDate": "18 Dic 2025",
+        "hasCard": true,
+        "balance": 8543.20
+    },
+    {
+        "id": 3,
+        "documentType": "J",
+        "documentNumber": "40123456",
+        "fullName": "Empresa XYZ C.A.",
+        "email": "contacto@empresaxyz.com",
+        "phone": "02125551234",
+        "status": "active",
+        "registrationDate": "20 Dic 2025",
+        "hasCard": false,
+        "balance": 45230.00
+    },
+    {
+        "id": 4,
+        "documentType": "V",
+        "documentNumber": "34567890",
+        "fullName": "Carlos Rodríguez",
+        "email": "carlos.rodriguez@email.com",
+        "phone": "04143334455",
+        "status": "pending",
+        "registrationDate": "22 Dic 2025",
+        "hasCard": false,
+        "balance": 0
+    },
+    {
+        "id": 5,
+        "documentType": "V",
+        "documentNumber": "45678901",
+        "fullName": "Ana Martínez",
+        "email": "ana.martinez@email.com",
+        "phone": "04261112233",
+        "status": "inactive",
+        "registrationDate": "10 Dic 2025",
+        "hasCard": true,
+        "balance": 2100.00
+    }
+]
