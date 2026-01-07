@@ -3,9 +3,11 @@ import { LogOut } from 'lucide-react';
 
 interface DashboardHeaderProps {
     onLogout: () => void;
+    subtitle?: string;
+    userInitials?: string;
 }
 
-export function DashboardHeader({ onLogout }: DashboardHeaderProps) {
+export function DashboardHeader({ onLogout, subtitle, userInitials = "DU" }: DashboardHeaderProps) {
     return (
         <header className="bg-black/50 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -16,7 +18,10 @@ export function DashboardHeader({ onLogout }: DashboardHeaderProps) {
                             alt="CiensPay Logo"
                             className="w-10 h-10 object-contain"
                         />
-                        <span className="text-2xl text-white">CiensPay</span>
+                        <div>
+                            <span className="text-2xl text-white block leading-none">CiensPay</span>
+                            {subtitle && <p className="text-white/40 text-xs">{subtitle}</p>}
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -28,7 +33,7 @@ export function DashboardHeader({ onLogout }: DashboardHeaderProps) {
                                 height: 40,
                             }}
                         >
-                            DU
+                            {userInitials}
                         </Avatar>
                         <Button
                             onClick={onLogout}

@@ -3,6 +3,7 @@ import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
+import { AdminDashboard } from './pages/AdminDashboard';
 
 function RegisterWrapper() {
   const navigate = useNavigate();
@@ -33,6 +34,15 @@ function DashboardWrapper() {
   );
 }
 
+function AdminDashboardWrapper() {
+  const navigate = useNavigate();
+  return (
+    <AdminDashboard
+      onLogout={() => navigate('/login')}
+    />
+  );
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -41,6 +51,7 @@ export default function App() {
         <Route path="/login" element={<LoginWrapper />} />
         <Route path="/register" element={<RegisterWrapper />} />
         <Route path="/dashboard" element={<DashboardWrapper />} />
+        <Route path="/admin-dashboard" element={<AdminDashboardWrapper />} />
       </Routes>
     </BrowserRouter>
   );
