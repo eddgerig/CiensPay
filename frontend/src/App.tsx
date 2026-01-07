@@ -6,6 +6,7 @@ import { Dashboard } from './pages/Dashboard';
 import { AdminDashboard } from './pages/AdminDashboard';
 import TestConnection from "./pages/TestConnection";
 import React from 'react';
+import CreateForm from "./components/CreateForm";
 function RegisterWrapper() {
   const navigate = useNavigate();
   return (
@@ -54,6 +55,7 @@ export default function App() {
         <Route path="/dashboard" element={<DashboardWrapper />} />
         <Route path="/admin-dashboard" element={<AdminDashboardWrapper />} />
         <Route path="/test-connection" element={<TestConnection />} />
+        <Route path="/test-connection2" element={<CreateForm />} />
       </Routes>
     </BrowserRouter>
   );

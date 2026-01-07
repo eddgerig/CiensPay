@@ -1,38 +1,46 @@
-version: '3.8'
-
 services:
   backend:
     build: ./backend
     container_name: django_api
-    command: python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./backend:/app
+      - sqlite_data:/app/db  # Volumen para persistir SQLite
     ports:
       - "8000:8000"
     environment:
-      - DEBUG=1
+      - DEBUG=True  # Cambiado de 1 a True
       - SECRET_KEY=dev-secret-key-123
-      - ALLOWED_HOSTS=localhost,127.0.0.1,backend
+      - ALLOWED_HOSTS=localhost,127.0.0.1,backend,0.0.0.0
+      - DATABASE_URL=sqlite:///db/db.sqlite3  # Ruta dentro del contenedor
     restart: unless-stopped
+    healthcheck:  # Opcional: healthcheck para el backend
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   frontend:
     build: ./frontend
-
     container_name: react_client
-
     volumes:
       - ./frontend:/app
       - /app/node_modules
-
     ports:
       - "5173:5173"
     environment:
       - NODE_ENV=development
-      - VITE_API_URL=http://localhost:8000/api # Para desarrollo local
-      # O usa esto para acceder desde el contenedor:
-      # - VITE_API_URL=http://backend:8000/api
+      - VITE_API_URL=http://localhost:8000/api  # Para navegador
+      # - VITE_API_URL=http://backend:8000/api  # Para llamadas entre contenedores
       - CHOKIDAR_USEPOLLING=true
-    command: sh -c "npm install && npm run dev"
+      - WATCHPACK_POLLING=true  # Mejor hot-reload
+    command: sh -c "npm run dev"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy  # Espera que backend esté saludable
     restart: unless-stopped
+
+volumes:
+  sqlite_data:  # Volumen para persistir la base de datos SQLite
