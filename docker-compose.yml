@@ -36,7 +36,7 @@ services:
       # - VITE_API_URL=http://backend:8000/api  # Para llamadas entre contenedores
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true  # Mejor hot-reload
-    command: sh -c "npm run dev"
+    command: sh -c "npm install && npm run dev"
     depends_on:
       backend:
         condition: service_healthy  # Espera que backend esté saludable
