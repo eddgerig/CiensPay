@@ -68,4 +68,7 @@ urlpatterns = [
     
     # Endpoint simple POST
     path('api/crear-simple/', crear_registro_simple, name='crear-simple'),
+    
+    #User
+    path('api/users/list_users/', usuarios_list, name='user_list'),
 ]

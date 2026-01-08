@@ -1,6 +1,10 @@
 import api from './index';
 
 export const crudAPI = {
+
+  //User
+  getUser: () => api.get('/users/list_users/'),
+
   // Productos
   getProductos: () => api.get('/productos/'),
   getProducto: (id) => api.get(`/productos/${id}/`),
