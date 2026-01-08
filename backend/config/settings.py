@@ -30,8 +30,16 @@ DEBUG = True
 
 #ALLOWED_HOSTS = []
 # ALLOWED_HOSTS
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-
+#ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# Opción C: Permitir todas las IPs de EC2 (seguro)
+ALLOWED_HOSTS = [
+    '.us-east-2.compute.amazonaws.com',  # Permite cualquier subdominio de AWS EC2
+    '.compute.amazonaws.com',            # Más genérico
+    '3.144.142.161',
+    'localhost',
+    '127.0.0.1',
+    '[::1]',
+]
 
 
 # Application definition
