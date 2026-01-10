@@ -7,6 +7,10 @@ import { AdminDashboard } from './pages/AdminDashboard';
 import TestConnection from "./pages/TestConnection";
 import React from 'react';
 import CreateForm from "./components/CreateForm";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+import PublicOnlyRoute from "./components/PublicOnlyRoute";
+
 function RegisterWrapper() {
   const navigate = useNavigate();
   return (
@@ -50,10 +54,33 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<LoginWrapper />} />
-        <Route path="/register" element={<RegisterWrapper />} />
-        <Route path="/dashboard" element={<DashboardWrapper />} />
-        <Route path="/admin-dashboard" element={<AdminDashboardWrapper />} />
+
+        {/* si está logueado, no lo dejes entrar a login/register */}
+        <Route path="/login" element={
+          <PublicOnlyRoute>
+            <LoginWrapper />
+          </PublicOnlyRoute>
+        } />
+
+        <Route path="/register" element={
+          <PublicOnlyRoute>
+            <RegisterWrapper />
+          </PublicOnlyRoute>
+        } />
+
+        {/* rutas protegidas */}
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <DashboardWrapper />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/admin-dashboard" element={
+          <ProtectedRoute>
+            <AdminDashboardWrapper />
+          </ProtectedRoute>
+        } />
+
         <Route path="/test-connection" element={<TestConnection />} />
         <Route path="/test-connection2" element={<CreateForm />} />
       </Routes>
