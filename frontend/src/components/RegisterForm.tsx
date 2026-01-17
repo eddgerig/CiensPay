@@ -157,27 +157,68 @@ export function RegisterForm({ onBack, onRegisterSuccess, embedded = false, hide
         return !hasErrors;
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-        if (!validateForm()) {
-            return;
+    if (!validateForm()) return;
+
+    if (onSubmit) {
+        onSubmit(formData);
+        return;
+    }
+
+    setIsLoading(true);
+
+    try {
+        const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+        // Backend actual espera: nombre, email, edad, password, password2
+        const payload = {
+        nombre: `${formData.firstName} ${formData.lastName}`.trim(),
+        email: formData.email.trim().toLowerCase(),
+        edad: 18, // <-- TEMPORAL: agrega campo "edad" en el form si lo quieres real
+        password: formData.password,
+        password2: formData.confirmPassword,
+        };
+
+        const res = await fetch(`${apiBase}/auth/register/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data?.success) {
+        // El backend devuelve { success:false, errors:{...} }
+        const be = data?.errors || {};
+        const msg = data?.message || 'No se pudo registrar';
+
+        setErrors({
+            documentNumber: '', // backend no valida esto aún
+            firstName: be?.nombre?.[0] || '',
+            lastName: '', // backend no separa apellido
+            phone: '', // backend no valida esto aún
+            email: be?.email?.[0] || '',
+            password: be?.password?.[0] || be?.non_field_errors?.[0] || msg,
+            confirmPassword: be?.password2?.[0] || '',
+        });
+
+        setIsLoading(false);
+        return;
         }
 
-        if (onSubmit) {
-            onSubmit(formData);
-            return;
-        }
+        setIsLoading(false);
+        if (onRegisterSuccess) onRegisterSuccess();
+    } catch (err) {
+        setIsLoading(false);
+        setErrors((prev) => ({
+        ...prev,
+        password: 'Error de red: no se pudo conectar al servidor',
+        }));
+    }
+};
 
-        setIsLoading(true);
-        // Simulate API call
-        setTimeout(() => {
-            setIsLoading(false);
-            if (onRegisterSuccess) {
-                onRegisterSuccess();
-            }
-        }, 2000);
-    };
 
     const handleChange = (field: keyof RegisterFormData) => (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | any

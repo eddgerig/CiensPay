@@ -36,7 +36,7 @@ export function DashboardHeader({ onLogout, subtitle, userInitials = "DU" }: Das
                             {userInitials}
                         </Avatar>
                         <Button
-                            onClick={onLogout}
+                              onClick={() => {localStorage.removeItem('access'); localStorage.removeItem('refresh'); localStorage.removeItem('user'); onLogout();}} 
                             startIcon={<LogOut className="w-4 h-4" />}
                             sx={{
                                 color: 'rgba(255, 255, 255, 0.6)',

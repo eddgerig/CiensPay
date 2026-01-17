@@ -52,23 +52,49 @@ export function Login({ onBack, onLoginSuccess }: LoginProps) {
             return;
         }
 
-        // Simulate login
+        // login
         setIsLoading(true);
-        setTimeout(() => {
+        try {
+        const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+        const res = await fetch(`${API_BASE}/auth/login/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+        });
+
+
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+            // mensaje del backend (401, 400, etc.)
+            const msg = data?.message || 'No se pudo iniciar sesión';
+            // ponlo en password por simplicidad (o crea error general)
+            setErrors({ email: '', password: msg });
             setIsLoading(false);
+            return;
+        }
+        // guardar tokens y user en localStorage
+        localStorage.setItem('access', data.access);
+        localStorage.setItem('refresh', data.refresh);
+        localStorage.setItem('user', JSON.stringify(data.user));
 
-            // Check if admin
-            if (email === 'admin@cienspay.com' && password === 'admin123') {
-                navigate('/admin-dashboard');
-                return;
-            }
+        setIsLoading(false);
 
-            if (onLoginSuccess) {
-                onLoginSuccess();
-            } else {
-                navigate('/dashboard');
-            }
-        }, 1500);
+        // Admin (si quieres basarte en email)
+        if (data.user?.email === 'admin@cienspay.com') {
+            navigate('/admin-dashboard');
+            return;
+        }
+
+        if (onLoginSuccess) onLoginSuccess();
+        else navigate('/dashboard');
+
+        } catch (err) {
+        setIsLoading(false);
+        setErrors({ email: '', password: 'Error de red: no se pudo conectar al servidor' });
+        }
+
     };
 
     return (

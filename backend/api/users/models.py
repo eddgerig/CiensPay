@@ -6,9 +6,11 @@ class User(models.Model):
     email = models.EmailField(unique=True)
     edad = models.IntegerField()
     fecha_registro = models.DateTimeField(auto_now_add=True)
-    
+    password = models.CharField(max_length=128)
+    username = models.CharField(max_length=150, unique=True, null=True, blank=True)
+
     class Meta:
-        db_table = 'usuarios'
+        db_table = 'auth_users'
     
     def __str__(self):
         return self.nombre
