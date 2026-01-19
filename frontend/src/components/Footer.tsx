@@ -9,7 +9,7 @@ export function Footer() {
             <div className="flex items-center gap-2 mb-4">
               <a href="/" className="flex items-center gap-2">
                 <img src="/Logo.png" alt="CiensPay logo" className="w-30 h-10 rounded-lg object-cover" />
-              
+
               </a>
             </div>
             <p className="text-white/60">
@@ -30,7 +30,7 @@ export function Footer() {
           <div>
             <h4 className="font-bold mb-4 text-white">Empresa</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-white/60 hover:text-primary transition-colors">Sobre nosotros</a></li>
+              <li><a href="#features" className="text-white/60 hover:text-primary transition-colors">Sobre nosotros</a></li>
               <li><a href="#" className="text-white/60 hover:text-primary transition-colors">Blog</a></li>
               <li><a href="#" className="text-white/60 hover:text-primary transition-colors">Carreras</a></li>
               <li><a href="#" className="text-white/60 hover:text-primary transition-colors">Prensa</a></li>
@@ -50,7 +50,7 @@ export function Footer() {
 
         <div className="border-t border-primary/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-white/60">© 2025. Todos los derechos reservados.</p>
-          
+
           <div className="flex gap-4">
             <a href="#" className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center hover:bg-primary/20 transition-colors">
               <Facebook className="text-primary" size={20} />
