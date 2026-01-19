@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
     # Local apps
     'rest_framework',
     'api',  # ← Agrega esta línea
@@ -124,6 +125,8 @@ CORS_ALLOW_ALL_ORIGINS = True  # Solo para desarrollo
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # <--- Actualiza este puerto
     "http://127.0.0.1:5173",
+    "http://3.144.142.161", 
+    "http://ec2-3-144-142-161.us-east-2.compute.amazonaws.com"
 ]
 
 

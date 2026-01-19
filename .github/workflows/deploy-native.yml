@@ -56,7 +56,6 @@ jobs:
           source: "nginx/*"
           target: "/home/ubuntu/cienspay-config"
 
-          
       - name: SSH Remote Commands
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -66,18 +65,18 @@ jobs:
           script: |
             cd /home/ubuntu/cienspay-backend
             
-            # Crear venv si no existe
+            # 1. Crear entorno virtual si no existe
             if [ ! -d "venv" ]; then
               python3 -m venv venv
             fi
             
-            # Activar venv e instalar deps
-            source venv/bin/activate
-            pip install -r requirements.txt
+            # 2. Instalar dependencias usando el pip del venv (Evita error PEP 668)
+            ./venv/bin/pip install --upgrade pip
+            ./venv/bin/pip install -r requirements.txt
             
-            # Migraciones y Static Files
-            python manage.py migrate
-            python manage.py collectstatic --noinput
+            # 3. Ejecutar comandos de Django usando el python del venv
+            ./venv/bin/python manage.py migrate
+            ./venv/bin/python manage.py collectstatic --noinput
             
-            # Reiniciar servicio
+            # 4. Reiniciar el servicio de Systemd (Asegúrate de que el nombre sea correcto)
             sudo systemctl restart cienspay-backend
