@@ -2,7 +2,6 @@ import { Header } from '../components/Header';
 import { Hero } from '../components/Hero';
 import { Features } from '../components/Features';
 import { Benefits } from '../components/Benefits';
-//import { Security } from '../components/Security';
 import { CTA } from '../components/CTA';
 import { Footer } from '../components/Footer';
 
@@ -12,9 +11,9 @@ export function Home() {
             <Header />
             <main>
                 <Hero />
-                <Features />
-                <Benefits />
 
+                <Benefits />
+                <Features />
                 <CTA />
             </main>
             <Footer />

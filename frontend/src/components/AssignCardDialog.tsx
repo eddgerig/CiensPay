@@ -126,7 +126,7 @@ export function AssignCardDialog({ open, onClose, onAssign, selectedUser }: Assi
                             placeholder="Ingrese número de cédula"
                             value={cardData.documentNumber}
                             onChange={(e) => setCardData({ ...cardData, documentNumber: e.target.value })}
-                            sx={inputStyles}
+                            sx={{ ...inputStyles, marginTop: '20px' }}
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">

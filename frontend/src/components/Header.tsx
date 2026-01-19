@@ -19,7 +19,7 @@ export function Header() {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
             <a href="/#features" className="text-white/80 hover:text-primary transition-colors">
-              Características
+              Nosotros
             </a>
             <a href="/#benefits" className="text-white/80 hover:text-primary transition-colors">
               Beneficios
@@ -54,7 +54,7 @@ export function Header() {
               className="block text-white/80 hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Características
+              Nosotros
             </a>
             <a
               href="#benefits"

@@ -27,6 +27,8 @@ const CreateForm = () => {
 
     try {
       const response = await crudAPI.testPost(formData);
+      const responseUser = await crudAPI.getUser();
+      console.log('Usuarios:', responseUser);
       
       if (response.success) {
         setResult(response.data);
