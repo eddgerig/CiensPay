@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'corsheaders',
+    
     # Local apps
     'rest_framework',
     'api',  # ← Agrega esta línea
