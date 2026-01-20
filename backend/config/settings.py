@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     
     # Local apps
     'rest_framework',
-    'api',  # ← Agrega esta línea
+    #'api',  # ← Agrega esta línea
 ]
 
 
