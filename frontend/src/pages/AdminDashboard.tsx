@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
     Button,
     Card,
@@ -37,11 +37,25 @@ import { AssignCardDialog } from '../components/AssignCardDialog';
 import usersData from '../data/users.json';
 import virtualCardsData from '../data/virtualCards.json';
 
+import { userAPI } from '../api/user';
+
 interface AdminDashboardProps {
     onLogout: () => void;
 }
 
 interface User {
+    id: number;
+    documentType: string;
+    documentNumber: string;
+    nombre: string;
+    email: string;
+    phone: string;
+    status: 'active' | 'inactive' | 'pending';
+    registrationDate: string;
+    hasCard: boolean;
+    balance: number;
+}
+/*interface User {
     id: number;
     documentType: string;
     documentNumber: string;
@@ -52,7 +66,7 @@ interface User {
     registrationDate: string;
     hasCard: boolean;
     balance: number;
-}
+}*/
 
 interface VirtualCard {
     id: number;
@@ -73,10 +87,38 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     // Mock data - usuarios registrados
-    const [users, setUsers] = useState<User[]>(usersData as User[]);
+    //const [users, setUsers] = useState<User[]>(usersData as User[]);
+    const [users, setUsers] = useState<User[]>([]);
 
 
+    useEffect(() => {
+        async function loadData(){
+
+            try {
+                  const response = await userAPI.getUserAll();;
+                  console.log('Usuarios:', response);
+                  
+                if (response.data.data) {
+                    console.log('Usuarios:', response.data.data);
+                // Si fetchMe devuelve un solo usuario, lo pones en un array
+                    setUsers([response.data.data]);
+                } else {
+                    //setError('No se pudo obtener el usuario');
+                }
+                
+            } catch (err) {
+                //setError('Error de conexión con el servidor');
+                console.error('Error:', err);
+            } finally {
+                //setLoading(false);
+            }
+        }
+        loadData();
+    }, []);
+    
     const [cards, setCards] = useState<VirtualCard[]>(virtualCardsData as VirtualCard[]);
 
     // Form state for new user
@@ -85,11 +127,60 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     // Form state for assign card
     // Managed in AssignCardDialog
 
-    const filteredUsers = users.filter(user =>
-        user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    /*const filteredUsers = users.filter(user =>
+        user.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.documentNumber.includes(searchTerm) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
+*/
+
+// Reemplaza tu useEffect del filtro por este:
+useEffect(() => {
+  console.log('🔄 Ejecutando filtro...');
+  console.log('👥 Total usuarios:', users.length);
+  console.log('🔍 Término de búsqueda:', searchTerm);
+  
+  if (users.length > 0) {
+    console.log('✅ Hay usuarios para filtrar');
+    
+    const filtered = users.filter(user => {
+      // Validación completa
+      if (!user || typeof user !== 'object') {
+        console.warn('⚠️ Usuario inválido encontrado:', user);
+        return false;
+      }
+      
+      // Obtener valores con múltiples posibles nombres
+      const nombre = user.nombre || '';
+      const documentNumber = user.documentNumber  || '';
+      const email = user.email  || '';
+      
+      const search = searchTerm.toLowerCase();
+      
+      // Si no hay término de búsqueda, incluir todos
+      if (!search.trim()) {
+        return true;
+      }
+      
+      // Convertir a string y validar
+      const nombreStr = String(nombre).toLowerCase();
+      const docStr = String(documentNumber).toLowerCase();
+      const emailStr = String(email).toLowerCase();
+      
+      return (
+        nombreStr.includes(search) ||
+        docStr.includes(search) ||
+        emailStr.includes(search)
+      );
+    });
+    
+    console.log('🎯 Usuarios filtrados encontrados:', filtered.length);
+    setFilteredUsers(filtered);
+  } else {
+    console.log('📭 No hay usuarios para filtrar');
+    setFilteredUsers([]);
+  }
+}, [users, searchTerm]);
 
     const stats = {
         totalUsers: users.length,
@@ -98,6 +189,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         activeCards: cards.filter(c => c.status === 'active').length,
         totalBalance: users.reduce((sum, u) => sum + u.balance, 0),
     };
+
 
     const handleHandleAddUser = (userData: any) => {
         // Aquí iría la lógica para agregar usuario
@@ -248,7 +340,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {filteredUsers.map((user) => (
+                                        {filteredUsers.length > 0 && filteredUsers.map((user) => (
+                                            console.log('Render'),
                                             <TableRow key={user.id} sx={{ '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.05)' } }}>
                                                 <TableCell sx={{ color: 'white', borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
                                                     <div className="flex items-center gap-3">
@@ -260,10 +353,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                                                 height: 36,
                                                             }}
                                                         >
-                                                            {user.fullName.charAt(0)}
+                                                            {user.nombre.charAt(0)}
                                                         </Avatar>
                                                         <div>
-                                                            <p className="text-white">{user.fullName}</p>
+                                                            <p className="text-white">{user.nombre}</p>
                                                             <p className="text-white/40 text-xs">{user.registrationDate}</p>
                                                         </div>
                                                     </div>

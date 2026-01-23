@@ -24,7 +24,7 @@ urlpatterns = [
 from django.contrib import admin
 from django.urls import path
 from django.http import JsonResponse  # Agrega esta línea
-from api.users.view import user_list, login_view, me_view
+from api.users.view import user_list, login_view, me_view, usuarios_list_all
 
 
 from api.views import (
@@ -78,5 +78,6 @@ urlpatterns = [
     path('api/auth/register/', user_list, name='auth-register'),  # POST
     path('api/auth/login/', login_view, name='auth-login'),       # POST
     path('api/auth/me/', me_view, name='auth-me'),                # GET (token)
+    path('api/users/list_all_users/', usuarios_list_all, name='usuarios_list_all'),
 
 ]

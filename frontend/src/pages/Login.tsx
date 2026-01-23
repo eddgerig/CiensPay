@@ -73,7 +73,7 @@ export function Login({ onBack, onLoginSuccess }: LoginProps) {
             setErrors({ email: '', password: msg });
             setIsLoading(false);
             return;
-        }
+        } 
         // guardar tokens y user en localStorage
         localStorage.setItem('access', data.access);
         localStorage.setItem('refresh', data.refresh);
