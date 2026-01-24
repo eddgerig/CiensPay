@@ -11,6 +11,6 @@ class User(models.Model):
 
     class Meta:
         db_table = 'auth_users'
-    
+        app_label = 'users'   
     def __str__(self):
         return self.nombre
