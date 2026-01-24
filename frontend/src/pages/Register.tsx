@@ -1,5 +1,6 @@
-import { ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
 import { RegisterForm } from '../components/RegisterForm';
+import { RegistrationSuccessModal } from '../components/RegistrationSuccessModal';
 
 interface RegisterProps {
     onBack: () => void;
@@ -7,6 +8,16 @@ interface RegisterProps {
 }
 
 export function Register({ onBack, onRegisterSuccess }: RegisterProps) {
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+    const handleRegisterSuccess = () => {
+        setShowSuccessModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowSuccessModal(false);
+        onRegisterSuccess();
+    };
     return (
         <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden py-12">
             {/* Background decorations */}
@@ -48,8 +59,13 @@ export function Register({ onBack, onRegisterSuccess }: RegisterProps) {
 
 
                 {/* Register Card */}
-                <RegisterForm onBack={onBack} onRegisterSuccess={onRegisterSuccess} />
+                <RegisterForm onBack={onBack} onRegisterSuccess={handleRegisterSuccess} />
             </div>
+
+            <RegistrationSuccessModal
+                open={showSuccessModal}
+                onClose={handleCloseModal}
+            />
         </div>
     );
 }
