@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     # Local apps
     'rest_framework',
     'api',  # ← Agrega esta línea
+    'drf_yasg',
 ]
 
 
