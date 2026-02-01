@@ -1,4 +1,4 @@
-from django.contrib import admin
+"""from django.contrib import admin
 from .models import Producto, Usuario
 
 @admin.register(Producto)
@@ -12,4 +12,4 @@ class ProductoAdmin(admin.ModelAdmin):
 class UsuarioAdmin(admin.ModelAdmin):
     list_display = ('id', 'nombre', 'email', 'edad', 'fecha_registro')
     search_fields = ('nombre', 'email')
-    list_filter = ('fecha_registro',)
+    list_filter = ('fecha_registro',)"""

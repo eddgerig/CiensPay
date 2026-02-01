@@ -174,11 +174,12 @@ const handleSubmit = async (e: React.FormEvent) => {
 
         // Backend actual espera: nombre, email, edad, password, password2
         const payload = {
-        nombre: `${formData.firstName} ${formData.lastName}`.trim(),
+        full_name: `${formData.firstName} ${formData.lastName}`.trim(),
         email: formData.email.trim().toLowerCase(),
-        edad: 18, // <-- TEMPORAL: agrega campo "edad" en el form si lo quieres real
+        //edad: 18, // <-- TEMPORAL: agrega campo "edad" en el form si lo quieres real
         password: formData.password,
         password2: formData.confirmPassword,
+        document_number: formData.documentNumber,
         };
 
         const res = await fetch(`${apiBase}/auth/register/`, {

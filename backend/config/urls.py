@@ -45,10 +45,10 @@ schema_view = get_schema_view(
 
 
 
-from api.views import (
+"""from api.views import (
     productos_list, producto_detail,
     usuarios_list, crear_registro_simple
-)
+)"""
 # --- ELIMINA ESTA LÍNCA ---
 # from apps.api.views import health_check, api_info
 
@@ -80,17 +80,17 @@ urlpatterns = [
     path('api/info/', api_info, name='api-info'),
         
     # CRUD Productos
-    path('api/productos/', productos_list, name='productos-list'),
-    path('api/productos/<int:pk>/', producto_detail, name='producto-detail'),
+    #path('api/productos/', productos_list, name='productos-list'),
+    #path('api/productos/<int:pk>/', producto_detail, name='producto-detail'),
     
     # CRUD Usuarios
-    path('api/usuarios/', usuarios_list, name='usuarios-list'),
+    #path('api/usuarios/', usuarios_list, name='usuarios-list'),
     
     # Endpoint simple POST
-    path('api/crear-simple/', crear_registro_simple, name='crear-simple'),
+    #path('api/crear-simple/', crear_registro_simple, name='crear-simple'),
     
     #User
-    path('api/users/list_users/', usuarios_list, name='user_list'),
+    #path('api/users/list_users/', usuarios_list, name='user_list'),
     
     # Auth (Registro + Login JWT)
     path('api/auth/register/', user_list, name='auth-register'),  # POST
