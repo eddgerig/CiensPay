@@ -57,6 +57,9 @@ INSTALLED_APPS = [
     # Local apps
     'rest_framework',
     'api',  # ← Agrega esta línea
+    'api.users',  
+    'api.card',  
+    'api.transaction',  
     'drf_yasg',
 ]
 

@@ -7,8 +7,8 @@ from django.contrib.auth.hashers import make_password
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'nombre', 'email', 'edad', 'fecha_registro', 'username', 'password']
-        read_only_fields = ['id', 'fecha_registro']
+        fields = ['id', 'full_name', 'email',  'registration_date']
+        read_only_fields = ['id', 'registration_date']
     
     def validate_email(self, value):
         """Validación personalizada para email"""
@@ -16,18 +16,18 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("El email es requerido")
         return value
     
-    def validate_edad(self, value):
-        """Validación personalizada para edad"""
+    """def validate_edad(self, value):
+        #Validación personalizada para edad
         if value < 0 or value > 150:
             raise serializers.ValidationError("La edad debe estar entre 0 y 150")
         return value
-
+"""
 class RegisterSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ("nombre", "email", "edad", "username", "password", "password2")
+        fields = ("full_name", "email", "username", "password", "password2")
         extra_kwargs = {
             "password": {"write_only": True},
         }
@@ -44,7 +44,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         username = validated_data.get("username")
         if not username:
             # si no  mandan username, se genera
-            base = (validated_data.get("email") or validated_data.get("nombre") or "user").split("@")[0]
+            base = (validated_data.get("email") or validated_data.get("full_name") or "user").split("@")[0]
             username = base
 
             # asegurar unicidad
