@@ -151,7 +151,7 @@ export function CiensPayCard({
                         </div>
 
                         {/* CVV */}
-                        {showCardDetails && (
+                        {(showCardDetails || isStatic) && (
                             <div>
                                 <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">CVV</p>
                                 <p className="text-gray-400 text-sm tracking-wider">{cvv}</p>
