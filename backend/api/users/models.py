@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.hashers import make_password, check_password
+
 
 from api.models import BaseModel
 
@@ -47,3 +49,21 @@ class User(BaseModel, models.Model):
 
     def __str__(self):
         return f"{self.full_name} - {self.document_number}"
+    def set_password(self, raw_password: str) -> None:
+        self.password = make_password(raw_password)
+
+    def check_password(self, raw_password: str) -> bool:
+        return django_check_password(raw_password, self.password)
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    @property
+    def is_staff(self):
+        # si "rol=True" significa admin, úsalo como staff
+        return bool(self.rol)
