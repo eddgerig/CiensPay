@@ -197,6 +197,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         isActive: boolean;
     } | null>(null);
 
+    // User delete confirmation state
+    const [confirmDeleteUserOpen, setConfirmDeleteUserOpen] = useState(false);
+    const [userToDelete, setUserToDelete] = useState<number | null>(null);
+
     async function loadUsers() {
         setIsLoadingUsers(true);
         try {
@@ -361,8 +365,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     };
 
     const handleDeleteUser = async (userId: number) => {
-        if (!window.confirm('¿Seguro que deseas desactivar este usuario?')) return;
+        setUserToDelete(userId);
+        setConfirmDeleteUserOpen(true);
+    };
 
+    const executeDeleteUser = async (userId: number) => {
         try {
             const res = await apiFetch(`${API_URL}/api/admin/users/${userId}/`, {
                 method: 'DELETE',
@@ -1111,6 +1118,88 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                     await executeToggleCardStatus(cardToToggle.id, cardToToggle.isActive);
                                     setConfirmToggleOpen(false);
                                     setCardToToggle(null);
+                                }
+                            }}
+                            variant="contained"
+                            sx={{
+                                backgroundColor: '#f87171',
+                                color: '#fff',
+                                textTransform: 'none',
+                                padding: '8px 24px',
+                                '&:hover': {
+                                    backgroundColor: '#ef4444',
+                                },
+                            }}
+                        >
+                            Sí, desactivar
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Confirmation Dialog for User Deactivation */}
+            <Dialog
+                open={confirmDeleteUserOpen}
+                onClose={() => {
+                    setConfirmDeleteUserOpen(false);
+                    setUserToDelete(null);
+                }}
+                maxWidth="xs"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        backgroundColor: '#1a1a1a',
+                        backgroundImage: 'none',
+                        border: '2px solid #d3ba30',
+                        borderRadius: '16px',
+                        padding: '24px',
+                    },
+                }}
+            >
+                <DialogContent sx={{ padding: '0', textAlign: 'center' }}>
+                    <div style={{ marginBottom: '20px' }}>
+                        <Ban style={{ width: '48px', height: '48px', color: '#f87171', marginBottom: '16px' }} />
+                        <h2
+                            style={{
+                                color: '#fff',
+                                fontSize: '20px',
+                                fontWeight: 'bold',
+                                margin: '0 0 12px',
+                            }}
+                        >
+                            ¿Seguro que desea desactivar este usuario?
+                        </h2>
+                        <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '14px', margin: 0 }}>
+                            Esta acción desactivará la cuenta del usuario
+                        </p>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '24px' }}>
+                        <Button
+                            onClick={() => {
+                                setConfirmDeleteUserOpen(false);
+                                setUserToDelete(null);
+                            }}
+                            variant="outlined"
+                            sx={{
+                                color: '#fff',
+                                borderColor: 'rgba(255, 255, 255, 0.2)',
+                                textTransform: 'none',
+                                padding: '8px 24px',
+                                '&:hover': {
+                                    borderColor: '#d3ba30',
+                                    backgroundColor: 'rgba(211, 186, 48, 0.1)',
+                                },
+                            }}
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={async () => {
+                                if (userToDelete !== null) {
+                                    await executeDeleteUser(userToDelete);
+                                    setConfirmDeleteUserOpen(false);
+                                    setUserToDelete(null);
                                 }
                             }}
                             variant="contained"
