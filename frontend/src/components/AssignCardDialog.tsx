@@ -7,19 +7,22 @@ import {
     Button,
     TextField,
     InputAdornment,
-    Autocomplete
+    Autocomplete,
+    CircularProgress,
+    Alert
 } from '@mui/material';
 import { CreditCard } from 'lucide-react';
 import { CiensPayCard } from './CiensPayCard';
+import type { User } from '../types/user';
 import usersData from '../data/users.json';
 
-interface User {
+// Local interface for the JSON data which uses camelCase
+interface UserData {
     id: number;
     documentType: string;
     documentNumber: string;
     fullName: string;
     email: string;
-    // other fields omitted as they are not used for display here
 }
 
 interface AssignCardDialogProps {
@@ -33,23 +36,64 @@ export function AssignCardDialog({ open, onClose, onAssign, selectedUser }: Assi
     const [cardData, setCardData] = useState({
         documentNumber: '',
     });
-    const [matchedUser, setMatchedUser] = useState<User | null>(null);
+    const [matchedUser, setMatchedUser] = useState<UserData | null>(null);
     const [inputValue, setInputValue] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [generatedCard, setGeneratedCard] = useState<string | null>(null);
+    const [previewCardNumber, setPreviewCardNumber] = useState<string>('4651 0000 0000 0000');
+
+    // Generate random card number preview with BIN 465100
+    const generateRandomCardPreview = () => {
+        const BIN = '465100';
+        const randomDigits = Array.from({ length: 9 }, () => Math.floor(Math.random() * 10)).join('');
+        const partial = BIN + randomDigits;
+
+        // Calculate Luhn check digit (simple implementation)
+        const digits = partial.split('').map(Number);
+        let sum = 0;
+        for (let i = digits.length - 1; i >= 0; i--) {
+            let digit = digits[i];
+            if ((digits.length - i) % 2 === 0) {
+                digit *= 2;
+                if (digit > 9) digit -= 9;
+            }
+            sum += digit;
+        }
+        const checkDigit = (10 - (sum % 10)) % 10;
+
+        const fullNumber = partial + checkDigit;
+        // Format as XXXX XXXX XXXX XXXX
+        return fullNumber.match(/.{1,4}/g)?.join(' ') || fullNumber;
+    };
 
     // Reset or sync state when modal opens or user changes
     useEffect(() => {
         if (open) {
             if (selectedUser) {
                 setCardData({
-                    documentNumber: selectedUser.documentNumber,
+                    documentNumber: selectedUser.document_number, // Changed from documentNumber to document_number
                 });
             } else {
                 setCardData({
                     documentNumber: '',
                 });
             }
+            // Reset states
+            setLoading(false);
+            setError(null);
+            setGeneratedCard(null);
+
+            // Start card number animation if user doesn't have a card and not loading
+            if (!selectedUser?.has_card && !loading) {
+                const interval = setInterval(() => {
+                    setPreviewCardNumber(generateRandomCardPreview());
+                }, 100); // Change every 100ms
+
+                return () => clearInterval(interval);
+            }
         }
-    }, [open, selectedUser]);
+    }, [open, selectedUser, loading]);
 
     const inputStyles = {
         '& .MuiOutlinedInput-root': {
@@ -85,12 +129,55 @@ export function AssignCardDialog({ open, onClose, onAssign, selectedUser }: Assi
         },
     };
 
-    const handleAssign = () => {
-        // Use selectedUser's document number if available, otherwise use input
-        const finalDocumentNumber = selectedUser ? selectedUser.documentNumber : cardData.documentNumber;
-        onAssign({
-            documentNumber: finalDocumentNumber,
-        });
+    const handleAssign = async () => {
+        setError(null);
+        setLoading(true);
+
+        try {
+            const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+
+            // Prepare request data
+            const requestData: any = {
+                saldo_inicial: 0
+            };
+
+            if (selectedUser) {
+                requestData.user_id = selectedUser.id;
+            } else {
+                requestData.document_number = cardData.documentNumber;
+            }
+
+            const response = await fetch(`${API_BASE}/cards/generate/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                setError(data.message || 'Error al generar la tarjeta');
+                setLoading(false);
+                return;
+            }
+
+            // Success!
+            setGeneratedCard(data.card.numero_tarjeta);
+            // Stop animation and show final card number
+            setPreviewCardNumber(data.card.numero_tarjeta.match(/.{1,4}/g)?.join(' ') || data.card.numero_tarjeta);
+            setLoading(false);
+
+            // Call parent callback immediately to refresh the list
+            onAssign({
+                documentNumber: selectedUser?.document_number || cardData.documentNumber
+            });
+
+        } catch (err: any) {
+            setError(err.message || 'Error de red al generar la tarjeta');
+            setLoading(false);
+        }
     };
 
     return (
@@ -113,18 +200,32 @@ export function AssignCardDialog({ open, onClose, onAssign, selectedUser }: Assi
             </DialogTitle>
             <DialogContent sx={{ paddingTop: '5px' }}>
                 <div className="flex flex-col gap-6">
+                    {/* Error Alert */}
+                    {error && (
+                        <Alert severity="error" sx={{ mb: 2 }}>
+                            {error}
+                        </Alert>
+                    )}
+
+                    {/* Success Alert */}
+                    {generatedCard && (
+                        <Alert severity="success" sx={{ mb: 2 }}>
+                            ¡Tarjeta generada exitosamente! Número: <strong>{generatedCard}</strong>
+                        </Alert>
+                    )}
+
                     {selectedUser && (
                         <div className="p-4 bg-white/5 border border-primary/20 rounded-lg">
                             <p className="text-white/60 text-sm mb-1">Usuario seleccionado:</p>
-                            <p className="text-white text-lg">{selectedUser.fullName}</p>
-                            <p className="text-white/60 text-sm">{selectedUser.documentType}-{selectedUser.documentNumber}</p>
+                            <p className="text-white text-lg">{selectedUser.full_name}</p>
+                            <p className="text-white/60 text-sm">{selectedUser.document_type}-{selectedUser.document_number}</p>
                         </div>
                     )}
 
                     {!selectedUser && (
                         <Autocomplete
                             freeSolo
-                            options={usersData as User[]}
+                            options={usersData as UserData[]}
                             getOptionLabel={(option) =>
                                 typeof option === 'string' ? option : option.documentNumber
                             }
@@ -144,7 +245,7 @@ export function AssignCardDialog({ open, onClose, onAssign, selectedUser }: Assi
                                 setCardData({ ...cardData, documentNumber: newInputValue });
 
                                 // Find matching user
-                                const matched = (usersData as User[]).find(
+                                const matched = (usersData as UserData[]).find(
                                     u => u.documentNumber === newInputValue
                                 );
                                 setMatchedUser(matched || null);
@@ -243,7 +344,8 @@ export function AssignCardDialog({ open, onClose, onAssign, selectedUser }: Assi
                     <div className="mt-0">
                         <p className="text-white/60 text-sm mb-1">Vista previa de la tarjeta:</p>
                         <CiensPayCard
-                            holderName={selectedUser?.fullName || matchedUser?.fullName || "Nombre del Usuario"}
+                            holderName={selectedUser?.full_name || matchedUser?.fullName || "Nombre del Usuario"}
+                            cardNumber={generatedCard ? generatedCard.match(/.{1,4}/g)?.join(' ') || generatedCard : previewCardNumber}
                             isStatic={true}
                         />
                     </div>
@@ -261,15 +363,20 @@ export function AssignCardDialog({ open, onClose, onAssign, selectedUser }: Assi
                 <Button
                     onClick={handleAssign}
                     variant="contained"
-                    startIcon={<CreditCard className="w-4 h-4" />}
+                    startIcon={loading ? <CircularProgress size={16} sx={{ color: '#000' }} /> : <CreditCard className="w-4 h-4" />}
+                    disabled={loading || !!generatedCard}
                     sx={{
                         backgroundColor: '#d3ba30',
                         color: '#000000',
                         textTransform: 'none',
                         '&:hover': { backgroundColor: '#b39928' },
+                        '&.Mui-disabled': {
+                            backgroundColor: 'rgba(211, 186, 48, 0.3)',
+                            color: 'rgba(0, 0, 0, 0.5)',
+                        },
                     }}
                 >
-                    Asignar Tarjeta
+                    {loading ? 'Generando...' : generatedCard ? 'Tarjeta Generada' : 'Asignar Tarjeta'}
                 </Button>
             </DialogActions>
         </Dialog>
