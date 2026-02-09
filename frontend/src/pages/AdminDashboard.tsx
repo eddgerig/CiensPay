@@ -190,6 +190,13 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         holderName: string;
     } | null>(null);
 
+    // Card toggle confirmation state
+    const [confirmToggleOpen, setConfirmToggleOpen] = useState(false);
+    const [cardToToggle, setCardToToggle] = useState<{
+        id: number;
+        isActive: boolean;
+    } | null>(null);
+
     async function loadUsers() {
         setIsLoadingUsers(true);
         try {
@@ -438,9 +445,19 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     };
 
     // Handle card status toggle
-    const handleToggleCardStatus = async (cardId: number) => {
-        if (!window.confirm('¿Seguro que deseas cambiar el estado de esta tarjeta?')) return;
+    const handleToggleCardStatus = async (cardId: number, isActive: boolean) => {
+        // Si la tarjeta está activa, mostrar modal de confirmación
+        if (isActive) {
+            setCardToToggle({ id: cardId, isActive });
+            setConfirmToggleOpen(true);
+            return;
+        }
 
+        // Si la tarjeta está inactiva, activarla directamente
+        await executeToggleCardStatus(cardId, isActive);
+    };
+
+    const executeToggleCardStatus = async (cardId: number, wasActive: boolean) => {
         try {
             const res = await apiFetch(`${API_URL}/api/cards/${cardId}/toggle/`, {
                 method: 'PATCH',
@@ -462,7 +479,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             await loadUsers();
             setNotification({
                 open: true,
-                message: data.message || 'Estado de tarjeta actualizado exitosamente',
+                message: wasActive ? 'Tarjeta desactivada exitosamente' : 'Tarjeta activada exitosamente',
                 severity: 'success',
             });
         } catch (err) {
@@ -863,7 +880,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                                             <IconButton
                                                                 size="small"
                                                                 sx={{ color: 'rgba(248, 113, 113, 0.8)' }}
-                                                                onClick={() => handleToggleCardStatus(card.id)}
+                                                                onClick={() => handleToggleCardStatus(card.id, card.activo)}
                                                                 title="Desactivar tarjeta"
                                                             >
                                                                 <Ban className="w-4 h-4" />
@@ -872,7 +889,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                                             <IconButton
                                                                 size="small"
                                                                 sx={{ color: 'rgba(74, 222, 128, 0.8)' }}
-                                                                onClick={() => handleToggleCardStatus(card.id)}
+                                                                onClick={() => handleToggleCardStatus(card.id, card.activo)}
                                                                 title="Activar tarjeta"
                                                             >
                                                                 <CheckCircle className="w-4 h-4" />
@@ -1028,6 +1045,88 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     )}
 
 
+                </DialogContent>
+            </Dialog>
+
+            {/* Confirmation Dialog for Card Deactivation */}
+            <Dialog
+                open={confirmToggleOpen}
+                onClose={() => {
+                    setConfirmToggleOpen(false);
+                    setCardToToggle(null);
+                }}
+                maxWidth="xs"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        backgroundColor: '#1a1a1a',
+                        backgroundImage: 'none',
+                        border: '2px solid #d3ba30',
+                        borderRadius: '16px',
+                        padding: '24px',
+                    },
+                }}
+            >
+                <DialogContent sx={{ padding: '0', textAlign: 'center' }}>
+                    <div style={{ marginBottom: '20px' }}>
+                        <Ban style={{ width: '48px', height: '48px', color: '#f87171', marginBottom: '16px' }} />
+                        <h2
+                            style={{
+                                color: '#fff',
+                                fontSize: '20px',
+                                fontWeight: 'bold',
+                                margin: '0 0 12px',
+                            }}
+                        >
+                            ¿Seguro que desea desactivar la tarjeta?
+                        </h2>
+                        <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '14px', margin: 0 }}>
+                            Esta acción bloqueará temporalmente la tarjeta
+                        </p>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '24px' }}>
+                        <Button
+                            onClick={() => {
+                                setConfirmToggleOpen(false);
+                                setCardToToggle(null);
+                            }}
+                            variant="outlined"
+                            sx={{
+                                color: '#fff',
+                                borderColor: 'rgba(255, 255, 255, 0.2)',
+                                textTransform: 'none',
+                                padding: '8px 24px',
+                                '&:hover': {
+                                    borderColor: '#d3ba30',
+                                    backgroundColor: 'rgba(211, 186, 48, 0.1)',
+                                },
+                            }}
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={async () => {
+                                if (cardToToggle) {
+                                    await executeToggleCardStatus(cardToToggle.id, cardToToggle.isActive);
+                                    setConfirmToggleOpen(false);
+                                    setCardToToggle(null);
+                                }
+                            }}
+                            variant="contained"
+                            sx={{
+                                backgroundColor: '#f87171',
+                                color: '#fff',
+                                textTransform: 'none',
+                                padding: '8px 24px',
+                                '&:hover': {
+                                    backgroundColor: '#ef4444',
+                                },
+                            }}
+                        >
+                            Sí, desactivar
+                        </Button>
+                    </div>
                 </DialogContent>
             </Dialog>
         </div>
