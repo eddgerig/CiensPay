@@ -27,7 +27,7 @@ from django.http import JsonResponse  # Agrega esta línea
 from api.users.view import user_list, login_view, me_view, usuarios_list_all
 ##from api.transaction.view import transaction_list
 from api.transaction.view import TransactionListAPIView
-from api.card.views import generate_card, list_cards, get_user_cards
+from api.card.views import generate_card, list_cards, get_user_cards, toggle_card_status
 
 
 """from api.views import (
@@ -108,6 +108,7 @@ urlpatterns = [
     path('api/cards/generate/', generate_card, name='generate-card'),
     path('api/cards/', list_cards, name='list-cards'),
     path('api/cards/user/<int:user_id>/', get_user_cards, name='get-user-cards'),
+    path('api/cards/<int:card_id>/toggle/', toggle_card_status, name='toggle-card-status'),
 
     # Swagger Documentation
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),

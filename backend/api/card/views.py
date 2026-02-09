@@ -65,10 +65,13 @@ def generate_card(request):
         # Fecha de vencimiento: 4 años desde hoy
         expiration_date = datetime.now() + timedelta(days=365*4)
         
+        # Usar el balance del usuario como saldo inicial de la tarjeta
+        initial_balance = int(user.balance)
+        
         # Crear la tarjeta
         card = Card.objects.create(
             numero_tarjeta=card_number,
-            saldo=data.get('saldo_inicial', 0),
+            saldo=initial_balance,  # Saldo = balance del usuario
             activo=True,
             user=user,
             fecha_vencimiento=expiration_date
@@ -122,3 +125,43 @@ def get_user_cards(request, user_id):
             'success': False,
             'message': 'Usuario no encontrado'
         }, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['PATCH'])
+@permission_classes([AllowAny])  # Cambiar a IsAuthenticated en producción
+def toggle_card_status(request, card_id):
+    """
+    Activa o desactiva una tarjeta
+    
+    Body params:
+    - activo (opcional): True o False para activar/desactivar
+    Si no se proporciona, se togglea el estado actual
+    """
+    try:
+        card = Card.objects.get(id=card_id)
+        
+        # Si se proporciona el campo activo, usarlo; sino, togglear
+        if 'activo' in request.data:
+            new_status = request.data['activo']
+        else:
+            new_status = not card.activo
+        
+        card.activo = new_status
+        card.save(update_fields=['activo'])
+        
+        return Response({
+            'success': True,
+            'message': f'Tarjeta {"activada" if new_status else "desactivada"} exitosamente',
+            'card': CardSerializer(card).data
+        }, status=status.HTTP_200_OK)
+        
+    except Card.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Tarjeta no encontrada'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': f'Error al actualizar el estado de la tarjeta: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

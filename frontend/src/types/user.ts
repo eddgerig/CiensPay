@@ -6,7 +6,7 @@ export interface Card {
     numero_tarjeta: string;
     saldo: number;
     fecha_asignacion: string;
-    fecha_vencimiento: string;
+    fecha_vencimiento: string | null;
     activo: boolean;
 }
 
@@ -16,12 +16,12 @@ export interface User {
     email: string;
     document_type: string;
     document_number: string;
-    phone: string;
+    phone: string | null;
     status: 'active' | 'inactive' | 'pending';
     registration_date: string;
     has_card: boolean;
     balance: string;
-    rol: string;
+    rol: string | boolean;
     cards_count: number;
     cards: Card[];
 }
