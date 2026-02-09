@@ -3,16 +3,31 @@ import { Card, CardContent, TablePagination } from '@mui/material';
 import { Filter, Download } from 'lucide-react';
 import recentTransactions from '../data/recentTransactions.json';
 
-export function TransactionHistory() {
+export function TransactionHistory({ userData }: { userData: any[] } = { userData: [] }) {
     const [page, setPage] = useState(0);
     const rowsPerPage = 6;
+
+    // Función para formatear fecha a "d Mes año"
+    const formatDate = (dateString: string) => {
+        if (!dateString) return '';
+        try {
+            const date = new Date(dateString);
+            const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            const day = date.getDate();
+            const month = months[date.getMonth()];
+            const year = date.getFullYear();
+            return `${day} ${month} ${year}`;
+        } catch (error) {
+            return dateString;
+        }
+    };
 
     const handleChangePage = (_event: unknown, newPage: number) => {
         setPage(newPage);
     };
 
     // Calculate pagination
-    const paginatedTransactions = recentTransactions.slice(
+    const paginatedTransactions = (userData || []).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
     );
@@ -55,15 +70,15 @@ export function TransactionHistory() {
                             className="flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 rounded-lg transition-all cursor-pointer group border border-transparent hover:border-primary/20"
                         >
                             <div className="flex flex-row items-center gap-3">
-                                <p className="text-primary text-sm font-medium">{transaction.name}</p>
-                                <p className="text-xs text-white/60">{transaction.date}</p>
+                                <p className="text-primary text-sm font-medium">{transaction.descripcion}</p>
+                                <p className="text-xs text-white/60">{formatDate(transaction.fecha_operacion)}</p>
                             </div>
 
                             <p
-                                className={`text-base font-medium ${transaction.type === 'income' ? 'text-primary' : 'text-white'
+                                className={`text-base font-medium ${transaction.tipo === 'income' ? 'text-primary' : 'text-white'
                                     }`}
                             >
-                                {transaction.type === 'income' ? '+' : '-'}${Math.abs(transaction.amount).toFixed(2)}
+                                {transaction.tipo === 'income' ? '+' : '-'}${Math.abs(transaction.monto).toFixed(2)}
                             </p>
                         </div>
                     ))}
@@ -71,7 +86,7 @@ export function TransactionHistory() {
 
                 <TablePagination
                     component="div"
-                    count={recentTransactions.length}
+                    count={userData?.length || 0}
                     page={page}
                     onPageChange={handleChangePage}
                     rowsPerPage={rowsPerPage}

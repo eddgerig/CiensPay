@@ -16,17 +16,29 @@ interface CiensPayCardProps {
     isStatic?: boolean;
 }
 
-export function CiensPayCard({
-    holderName = "John Doe",
-    cardNumber = "5123 4567 8901 2345",
-    expiryDate = "12/26",
-    cvv = "123",
-    isStatic = false
-}: CiensPayCardProps) {
+export function CiensPayCard(props: any) {
     const [showCardDetails, setShowCardDetails] = useState(false);
     const [copiedCard, setCopiedCard] = useState(false);
+    const { userData, isStatic = false } = props;
+    
+    let card = userData?.cards?.[0] || {};
+    let user = userData?.user || {};
+
+    // Función para formatear fecha
+    const formatDate = (dateString: string) => {
+        if (!dateString) return '••/••';
+        try {
+            const date = new Date(dateString);
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${month}/${day}`;
+        } catch (error) {
+            return '••/••';
+        }
+    };
 
     const handleCopyCard = () => {
+        const cardNumber = card['numero_tarjeta'] || '';
         navigator.clipboard.writeText(cardNumber.replace(/\s/g, ''));
         setCopiedCard(true);
         setTimeout(() => setCopiedCard(false), 2000);
@@ -119,7 +131,7 @@ export function CiensPayCard({
                 <div className="relative mb-5">
                     {showCardDetails || isStatic ? (
                         <div className="flex items-center gap-3">
-                            <p className="text-gray-400 text-lg tracking-[0.3em] font-mono">{cardNumber}</p>
+                            <p className="text-gray-400 text-lg tracking-[0.3em] font-mono">{card['numero_tarjeta'] || '•••• •••• •••• ••••'}</p>
                             {!isStatic && (
                                 <IconButton
                                     size="small"
@@ -131,7 +143,7 @@ export function CiensPayCard({
                             )}
                         </div>
                     ) : (
-                        <p className="text-gray-400 text-lg tracking-[0.3em] font-mono">•••• •••• •••• {cardNumber.slice(-4)}</p>
+                        <p className="text-gray-400 text-lg tracking-[0.3em] font-mono">•••• •••• •••• {card['numero_tarjeta']?.slice(-4) || '••••'}</p>
                     )}
                 </div>
 
@@ -141,20 +153,20 @@ export function CiensPayCard({
                         {/* Valid thru */}
                         <div>
                             <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Valid Thru</p>
-                            <p className="text-gray-400 text-sm tracking-wider">{showCardDetails || isStatic ? expiryDate : '••/••'}</p>
+                            <p className="text-gray-400 text-sm tracking-wider">{showCardDetails || isStatic ? formatDate(card['fecha_vencimiento']) : '••/••'}</p>
                         </div>
 
                         {/* Cardholder name */}
                         <div>
                             <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Cardholder</p>
-                            <p className="text-gray-400 text-sm tracking-wider uppercase">{holderName}</p>
+                            <p className="text-gray-400 text-sm tracking-wider uppercase">{user['full_name']}</p>
                         </div>
 
                         {/* CVV */}
                         {(showCardDetails || isStatic) && (
                             <div>
                                 <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">CVV</p>
-                                <p className="text-gray-400 text-sm tracking-wider">{cvv}</p>
+                                {/*p className="text-gray-400 text-sm tracking-wider">{cvv}</p*/}
                             </div>
                         )}
                     </div>

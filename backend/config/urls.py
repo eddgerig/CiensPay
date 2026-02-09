@@ -26,7 +26,7 @@ from django.urls import path
 from django.http import JsonResponse  # Agrega esta línea
 from api.users.view import user_list, login_view, me_view, usuarios_list_all
 ##from api.transaction.view import transaction_list
-from api.transaction.view import TransactionListAPIView
+from api.transaction.view import TransactionListAPIView, UserCardsTransactionsAPIView
 
 
 """from api.views import (
@@ -106,4 +106,6 @@ urlpatterns = [
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+
+    path('api/user/<int:user_id>/financial-data/', UserCardsTransactionsAPIView.as_view(), name='user-financial-data'),
 ]
