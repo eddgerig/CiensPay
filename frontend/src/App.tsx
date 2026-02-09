@@ -4,8 +4,8 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
 import { AdminDashboard } from './pages/AdminDashboard';
+import { PaymentButton } from './pages/PaymentButton';
 import TestConnection from "./pages/TestConnection";
-import React from 'react';
 import CreateForm from "./components/CreateForm";
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -80,6 +80,9 @@ export default function App() {
             <AdminDashboardWrapper />
           </ProtectedRoute>
         } />
+
+        {/* Ruta pública para botón de pago (simulador) */}
+        <Route path="/payment-button" element={<PaymentButton />} />
 
         <Route path="/test-connection" element={<TestConnection />} />
         <Route path="/test-connection2" element={<CreateForm />} />
