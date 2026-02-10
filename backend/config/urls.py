@@ -27,6 +27,7 @@ from django.http import JsonResponse  # Agrega esta línea
 from api.users.view import user_list, login_view, me_view, usuarios_list_all
 ##from api.transaction.view import transaction_list
 from api.transaction.view import TransactionListAPIView, UserCardsTransactionsAPIView
+from api.card.views import generate_card, list_cards, get_user_cards, toggle_card_status
 
 
 """from api.views import (
@@ -61,6 +62,7 @@ def api_info(request):
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from api.admin_views import admin_users_cards, admin_user_detail
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -102,10 +104,18 @@ urlpatterns = [
     # all transactions
     path('api/transactions/transaction_list/', TransactionListAPIView.as_view(), name='transaction_list'),
 
+    # Card Management
+    path('api/cards/generate/', generate_card, name='generate-card'),
+    path('api/cards/', list_cards, name='list-cards'),
+    path('api/cards/user/<int:user_id>/', get_user_cards, name='get-user-cards'),
+    path('api/cards/<int:card_id>/toggle/', toggle_card_status, name='toggle-card-status'),
+
     # Swagger Documentation
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-
+    path("api/admin/users-cards/", admin_users_cards, name="admin-users-cards"),
+    path("api/admin/users-cards/", admin_users_cards, name="admin-users-cards"),
+    path("api/admin/users/<int:pk>/", admin_user_detail, name="admin-user-detail"),
     path('api/user/<int:user_id>/financial-data/', UserCardsTransactionsAPIView.as_view(), name='user-financial-data'),
 ]

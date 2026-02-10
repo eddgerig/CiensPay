@@ -13,6 +13,7 @@ export interface RegisterFormData {
     email: string;
     password: string;
     confirmPassword: string;
+    balance?: string;
 }
 
 interface RegisterFormProps {
@@ -35,6 +36,7 @@ interface FormErrors {
     email?: string;
     password?: string;
     confirmPassword?: string;
+    balance?: string;
 }
 
 export function RegisterForm({ onBack, onRegisterSuccess, embedded = false, hidePassword = false, initialData, onSubmit, sx, submitLabel }: RegisterFormProps) {
@@ -53,6 +55,7 @@ export function RegisterForm({ onBack, onRegisterSuccess, embedded = false, hide
         email: initialData?.email || '',
         password: '',
         confirmPassword: '',
+        balance: initialData?.balance || '0.00',
     });
 
     useEffect(() => {
@@ -65,6 +68,7 @@ export function RegisterForm({ onBack, onRegisterSuccess, embedded = false, hide
                 lastName: initialData.lastName || '',
                 phone: initialData.phone || '',
                 email: initialData.email || '',
+                balance: initialData.balance || '0.00',
             }));
         }
     }, [initialData]);
@@ -128,6 +132,18 @@ export function RegisterForm({ onBack, onRegisterSuccess, embedded = false, hide
         } else if (!validateEmail(formData.email)) {
             newErrors.email = 'Email inválido';
             hasErrors = true;
+        }
+
+        // Balance (optional for edit mode)
+        if (formData.balance !== undefined && formData.balance !== '') {
+            const balanceNum = parseFloat(formData.balance);
+            if (isNaN(balanceNum)) {
+                newErrors.balance = 'Balance inválido';
+                hasErrors = true;
+            } else if (balanceNum < 0) {
+                newErrors.balance = 'El balance no puede ser negativo';
+                hasErrors = true;
+            }
         }
 
         if (!hidePassword) {
@@ -413,6 +429,29 @@ export function RegisterForm({ onBack, onRegisterSuccess, embedded = false, hide
                     sx={inputStyles}
                 />
             </div>
+
+            {/* Balance (only show in edit mode) */}
+            {initialData && (
+                <div className="grid md:grid-cols-2 gap-6">
+                    <TextField
+                        fullWidth
+                        label="Balance"
+                        value={formData.balance}
+                        onChange={handleChange('balance')}
+                        error={!!errors.balance}
+                        helperText={errors.balance || 'Balance disponible del usuario'}
+                        placeholder="0.00"
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <span style={{ color: '#d3ba30', fontSize: '16px', fontWeight: 'bold' }}>$</span>
+                                </InputAdornment>
+                            ),
+                        }}
+                        sx={inputStyles}
+                    />
+                </div>
+            )}
 
             {/* Passwords */}
             {!hidePassword && (

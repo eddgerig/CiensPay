@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import  User
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.hashers import make_password
+from api.card.models import Card
+from api.users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -61,3 +63,40 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.password = make_password(password)
         user.save()
         return user
+    
+class CardAdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Card
+        fields = ["id", "numero_tarjeta", "saldo", "activo", "fecha_asignacion", "fecha_vencimiento"]
+
+class UserWithCardsSerializer(serializers.ModelSerializer):
+    cards = CardAdminSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            "id", "full_name", "email", "phone",
+            "document_type", "document_number",
+            "status", "rol", "has_card", "balance",
+            "registration_date",
+            "cards"
+        ]
+
+class AdminUserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        # Campos que SÍ permites modificar desde el dashboard admin
+        fields = [
+            "full_name",
+            "email",
+            "phone",
+            "status",
+            "has_card",
+            "balance",
+            "rol",
+            "username",
+        ]
+        extra_kwargs = {
+            "email": {"required": False},
+            "username": {"required": False},
+        }
