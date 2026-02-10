@@ -75,10 +75,10 @@ export function TransactionHistory({ userData }: { userData: any[] } = { userDat
                             </div>
 
                             <p
-                                className={`text-base font-medium ${transaction.tipo === 'income' ? 'text-primary' : 'text-white'
+                                className={`text-base font-medium ${['DEP', 'REE'].includes(transaction.tipo) ? 'text-primary' : 'text-white'
                                     }`}
                             >
-                                {transaction.tipo === 'income' ? '+' : '-'}${Math.abs(transaction.monto).toFixed(2)}
+                                {['DEP', 'REE'].includes(transaction.tipo) ? '+' : '-'}${Math.abs(transaction.monto).toFixed(2)}
                             </p>
                         </div>
                     ))}

@@ -6,6 +6,10 @@ import {
     TextField,
     Button,
     InputAdornment,
+    Snackbar,
+    Alert,
+    CircularProgress,
+
 } from '@mui/material';
 import {
     CreditCard,
@@ -59,11 +63,68 @@ export function PaymentButton() {
         setFormData({ ...formData, [field]: formattedValue });
     };
 
-    const handlePayment = (e: React.FormEvent) => {
+    const [loading, setLoading] = useState(false);
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'success' as 'success' | 'error',
+    });
+
+    const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
+
+    const handlePayment = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Aquí irá la lógica de pago más adelante
-        console.log('Processing payment:', formData);
+        setLoading(true);
+
+        try {
+            const response = await fetch('http://localhost:8000/api/transactions/simulate/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    card_number: formData.cardNumber,
+                    expiry_date: formData.expiryDate,
+                    cvv: formData.cvv,
+                    amount: formData.amount,
+                    description: 'Compra en Tienda Demo',
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setSnackbar({
+                    open: true,
+                    message: data.message || 'Pago realizado con éxito',
+                    severity: 'success',
+                });
+                // Optional: Clear form or redirect
+                setFormData({
+                    cardNumber: '',
+                    cardHolder: '',
+                    expiryDate: '',
+                    cvv: '',
+                    amount: '',
+                });
+            } else {
+                setSnackbar({
+                    open: true,
+                    message: data.error || 'Error al procesar el pago',
+                    severity: 'error',
+                });
+            }
+        } catch (error) {
+            setSnackbar({
+                open: true,
+                message: 'Error de conexión con el servidor',
+                severity: 'error',
+            });
+        } finally {
+            setLoading(false);
+        }
     };
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-black via-[#0a0a0a] to-black">
@@ -382,8 +443,9 @@ export function PaymentButton() {
                                                 boxShadow: '0 8px 24px rgba(211, 186, 48, 0.3)',
                                             },
                                         }}
+                                        disabled={loading}
                                     >
-                                        Pagar ${formData.amount || '0.00'}
+                                        {loading ? <CircularProgress size={24} color="inherit" /> : `Pagar $${formData.amount || '0.00'}`}
                                     </Button>
                                 </form>
                             </CardContent>
@@ -391,6 +453,18 @@ export function PaymentButton() {
                     </div>
                 </div>
             </div>
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
+
         </div>
     );
 }

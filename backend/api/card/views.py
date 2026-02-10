@@ -165,3 +165,60 @@ def toggle_card_status(request, card_id):
             'success': False,
             'message': f'Error al actualizar el estado de la tarjeta: {str(e)}'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+@api_view(['PATCH'])
+@permission_classes([AllowAny])  # Cambiar a IsAuthenticated en producción
+def update_card_balance(request, card_id):
+    """
+    Actualiza el saldo de una tarjeta
+    
+    Body params:
+    - balance: Nuevo saldo (entero o decimal)
+    """
+    try:
+        card = Card.objects.get(id=card_id)
+        
+        if 'balance' not in request.data:
+            return Response({
+                'success': False,
+                'message': 'El campo balance es requerido'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            new_balance = int(float(request.data['balance']))
+        except (ValueError, TypeError):
+             return Response({
+                'success': False,
+                'message': 'El balance debe ser un número válido'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if new_balance < 0:
+             return Response({
+                'success': False,
+                'message': 'El balance no puede ser negativo'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        card.saldo = new_balance
+        card.save(update_fields=['saldo'])
+        
+        # También actualizamos el balance del usuario para mantener consistencia 
+        # (si esa es la lógica deseada, sino comentar las siguientes 2 líneas)
+        if card.user:
+            card.user.balance = new_balance
+            card.user.save(update_fields=['balance'])
+        
+        return Response({
+            'success': True,
+            'message': 'Saldo actualizado exitosamente',
+            'card': CardSerializer(card).data
+        }, status=status.HTTP_200_OK)
+        
+    except Card.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Tarjeta no encontrada'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': f'Error al actualizar el saldo: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

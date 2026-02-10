@@ -16,13 +16,16 @@ interface CiensPayCardProps {
     isStatic?: boolean;
 }
 
-export function CiensPayCard(props: any) {
+export function CiensPayCard(props: CiensPayCardProps & { userData?: any }) {
     const [showCardDetails, setShowCardDetails] = useState(false);
     const [copiedCard, setCopiedCard] = useState(false);
-    const { userData, isStatic = false } = props;
-    
-    let card = userData?.cards?.[0] || {};
-    let user = userData?.user || {};
+    const { userData, isStatic = false, holderName, cardNumber, expiryDate, cvv } = props;
+
+    // Prefer props, fallback to userData
+    const cardNum = cardNumber || userData?.cards?.[0]?.['numero_tarjeta'];
+    const cardHolder = holderName || userData?.user?.['full_name'];
+    const cardExpiry = expiryDate || userData?.cards?.[0]?.['fecha_vencimiento'];
+    const cardCvv = cvv || '•••'; // CVV might not be available in userData usually
 
     // Función para formatear fecha
     const formatDate = (dateString: string) => {
@@ -38,7 +41,7 @@ export function CiensPayCard(props: any) {
     };
 
     const handleCopyCard = () => {
-        const cardNumber = card['numero_tarjeta'] || '';
+        const cardNumber = cardNum || '';
         navigator.clipboard.writeText(cardNumber.replace(/\s/g, ''));
         setCopiedCard(true);
         setTimeout(() => setCopiedCard(false), 2000);
@@ -131,7 +134,7 @@ export function CiensPayCard(props: any) {
                 <div className="relative mb-5">
                     {showCardDetails || isStatic ? (
                         <div className="flex items-center gap-3">
-                            <p className="text-gray-400 text-lg tracking-[0.3em] font-mono">{card['numero_tarjeta'] || '•••• •••• •••• ••••'}</p>
+                            <p className="text-gray-400 text-lg tracking-[0.3em] font-mono">{cardNum || '•••• •••• •••• ••••'}</p>
                             {!isStatic && (
                                 <IconButton
                                     size="small"
@@ -143,7 +146,7 @@ export function CiensPayCard(props: any) {
                             )}
                         </div>
                     ) : (
-                        <p className="text-gray-400 text-lg tracking-[0.3em] font-mono">•••• •••• •••• {card['numero_tarjeta']?.slice(-4) || '••••'}</p>
+                        <p className="text-gray-400 text-lg tracking-[0.3em] font-mono">•••• •••• •••• {cardNum?.slice(-4) || '••••'}</p>
                     )}
                 </div>
 
@@ -153,20 +156,20 @@ export function CiensPayCard(props: any) {
                         {/* Valid thru */}
                         <div>
                             <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Valid Thru</p>
-                            <p className="text-gray-400 text-sm tracking-wider">{showCardDetails || isStatic ? formatDate(card['fecha_vencimiento']) : '••/••'}</p>
+                            <p className="text-gray-400 text-sm tracking-wider">{showCardDetails || isStatic ? formatDate(cardExpiry) : '••/••'}</p>
                         </div>
 
                         {/* Cardholder name */}
                         <div>
                             <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Cardholder</p>
-                            <p className="text-gray-400 text-sm tracking-wider uppercase">{user['full_name']}</p>
+                            <p className="text-gray-400 text-sm tracking-wider uppercase">{cardHolder}</p>
                         </div>
 
                         {/* CVV */}
                         {(showCardDetails || isStatic) && (
                             <div>
                                 <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">CVV</p>
-                                {/*p className="text-gray-400 text-sm tracking-wider">{cvv}</p*/}
+                                <p className="text-gray-400 text-sm tracking-wider">{cardCvv}</p>
                             </div>
                         )}
                     </div>

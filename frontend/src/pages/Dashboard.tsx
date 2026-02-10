@@ -18,32 +18,28 @@ export function Dashboard({ onLogout }: DashboardProps) {
         setStoredValue(value);
     }, []);
 
-    // Función para actualizar el valor
-    const updateValue = (newValue: string) => {
-        localStorage.setItem('user', newValue);
-        setStoredValue(newValue);
-    };
+
 
     // Llamar a la API cuando hay un valor en el localStorage
     useEffect(() => {
         const fetchData = async () => {
             if (storedValue) {
                 try {
-                    console.log('Obteniendo datos para el usuario:', JSON.parse(storedValue) );
+                    console.log('Obteniendo datos para el usuario:', JSON.parse(storedValue));
                     const userId = JSON.parse(storedValue).id; // Asegúrate de que el formato del valor almacenado es correcto
                     const response = await fetch(`http://localhost:8000/api/user/${userId}/financial-data/`);
-                    
+
                     if (!response.ok) {
                         throw new Error('Error al obtener los datos del usuario');
                     }
-                    
+
                     const data = await response.json();
                     setUserData(data);
                     console.log('Datos del usuario:', data);
-                    
+
                     // Aquí puedes manejar los datos recibidos, por ejemplo:
                     // setUserData(data);
-                    
+
                 } catch (error) {
                     console.error('Error al llamar a la API:', error);
                 }
@@ -57,7 +53,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
         <div className="min-h-screen bg-gradient-to-br from-black via-[#0a0a0a] to-black">
             {/* Header */}
             {/* Header */}
-            
+
             <DashboardHeader onLogout={onLogout} />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import  Transaction
-from .serializer import TransactionSerializer
+from .serializer import TransactionSerializer, TransactionCreateSerializer
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password
@@ -15,6 +15,9 @@ from django.shortcuts import get_object_or_404
 from api.users.models import User
 from api.card.models import Card
 from api.card.serializer import CardSerializer
+from datetime import datetime
+import pytz
+
 
 
 import json
@@ -35,10 +38,13 @@ def transaction_list(request):
         })"""
     
 
-class TransactionListAPIView(generics.ListAPIView):
-    #serializer_class = TransactionSerializer
+class TransactionListAPIView(generics.ListCreateAPIView):
     queryset = Transaction.objects.select_related('card').all()
-    serializer_class = TransactionSerializer
+    
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return TransactionCreateSerializer
+        return TransactionSerializer
     
     def transaction_list(self):
         # select_related hace el JOIN en la consulta SQL
@@ -94,21 +100,87 @@ class UserCardsTransactionsAPIView(APIView):
         }
         
         return Response(response_data, status=status.HTTP_200_OK)
-    
-    """elif request.method == 'POST':
-        serializer = RegisterSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            return Response({
-                'success': True,
-                'message': 'Usuario registrado exitosamente',
-                'data': UserSerializer(user).data
-            }, status=status.HTTP_201_CREATED)
 
-        return Response({
-            'success': False,
-            'errors': serializer.errors
-    }, status=status.HTTP_400_BAD_REQUEST)"""
+class SimulatePaymentAPIView(APIView):
+    permission_classes = [AllowAny]  # Permitir acceso sin autenticación para el simulador
+
+    def post(self, request):
+        card_number = request.data.get('card_number')
+        expiry_date = request.data.get('expiry_date') # Formato MM/YY
+        cvv = request.data.get('cvv')
+        amount = request.data.get('amount')
+        description = request.data.get('description', 'Compra simulada')
+
+        if not all([card_number, expiry_date, cvv, amount]):
+            return Response({'error': 'Todos los campos son requeridos'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            amount = float(amount)
+            if amount <= 0:
+                raise ValueError
+        except ValueError:
+            return Response({'error': 'Monto inválido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 1. Validar tarjeta
+        try:
+            card = Card.objects.get(numero_tarjeta=card_number.replace(" ", ""))
+        except Card.DoesNotExist:
+            return Response({'error': 'Tarjeta no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+
+        if not card.activo:
+            return Response({'error': 'La tarjeta no está activa'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 2. Validar fecha de vencimiento
+        # Asumiendo que expiry_date viene como "MM/YY"
+        try:
+            exp_month, exp_year = map(int, expiry_date.split('/'))
+            # Convertir año de 2 dígitos a 4 (asumiendo 20xx)
+            exp_year += 2000
+            
+            # Obtener el último día del mes de vencimiento para comparar con la fecha de la base de datos
+            # O simplemente comparar mes y año si fecha_vencimiento es solo fecha
+            if card.fecha_vencimiento:
+                if card.fecha_vencimiento.year != exp_year or card.fecha_vencimiento.month != exp_month:
+                     return Response({'error': 'Fecha de vencimiento incorrecta'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Verificar si ya venció (opcional, dependiendo de si se bloquean transacciones)
+                now = datetime.now(pytz.UTC)
+                if card.fecha_vencimiento < now:
+                     return Response({'error': 'La tarjeta ha expirado'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except ValueError:
+            return Response({'error': 'Formato de fecha de vencimiento inválido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 3. Validar saldo
+        if card.saldo < amount:
+            return Response({'error': 'Fondos insuficientes'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 4. Procesar pago
+        try:
+            saldo_anterior = card.saldo
+            card.saldo -= amount
+            card.save()
+            
+            Transaction.objects.create(
+                card=card,
+                tipo=Transaction.TransactionType.RETIRO, # O 'COMPRA' si existiera
+                monto=amount,
+                saldo_anterior=saldo_anterior,
+                saldo_posterior=card.saldo,
+                descripcion=description,
+                exitoso=True
+            )
+            
+            return Response({
+                'success': True, 
+                'message': 'Pago realizado con éxito',
+                'new_balance': card.saldo
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 
 """
 @api_view(['POST'])

@@ -188,6 +188,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     const [selectedCardToView, setSelectedCardToView] = useState<{
         cardNumber: string;
         holderName: string;
+        expiryDate: string;
     } | null>(null);
 
     // Card toggle confirmation state
@@ -417,22 +418,48 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 return;
             }
 
-            const res = await apiFetch(`${API_URL}/api/admin/users/${userId}/`, {
-                method: 'PATCH',
-                body: JSON.stringify({ balance: newBalance }),
-            });
+            // Find user to check for cards
+            const userToUpdate = users.find(u => u.id === userId);
 
-            const text = await res.text();
-            const data = safeJson<any>(text);
-
-            if (!res.ok || !data?.success) {
-                console.error('Error actualizando balance:', res.status, text);
-                setNotification({
-                    open: true,
-                    message: data?.message || 'No se pudo actualizar el balance',
-                    severity: 'error',
+            if (userToUpdate && userToUpdate.cards && userToUpdate.cards.length > 0) {
+                // Update CARD balance
+                const cardId = userToUpdate.cards[0].id;
+                const res = await apiFetch(`${API_URL}/api/cards/${cardId}/balance/`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ balance: balanceNum }),
                 });
-                return;
+
+                const text = await res.text();
+                const data = safeJson<any>(text);
+
+                if (!res.ok || !data?.success) {
+                    console.error('Error actualizando balance de tarjeta:', res.status, text);
+                    setNotification({
+                        open: true,
+                        message: data?.message || 'No se pudo actualizar el balance de la tarjeta',
+                        severity: 'error',
+                    });
+                    return;
+                }
+            } else {
+                // Update USER balance (fallback)
+                const res = await apiFetch(`${API_URL}/api/admin/users/${userId}/`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ balance: newBalance }),
+                });
+
+                const text = await res.text();
+                const data = safeJson<any>(text);
+
+                if (!res.ok || !data?.success) {
+                    console.error('Error actualizando balance de usuario:', res.status, text);
+                    setNotification({
+                        open: true,
+                        message: data?.message || 'No se pudo actualizar el balance',
+                        severity: 'error',
+                    });
+                    return;
+                }
             }
 
             await loadUsers();
@@ -673,7 +700,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                                         <div
                                                             onClick={() => {
                                                                 setEditingBalanceUserId(user.id);
-                                                                setEditingBalanceValue(user.balance);
+                                                                // Prefer card balance if available
+                                                                const displayBalance = user.cards && user.cards.length > 0
+                                                                    ? user.cards[0].saldo
+                                                                    : user.balance;
+                                                                setEditingBalanceValue(String(displayBalance));
                                                             }}
                                                             style={{
                                                                 cursor: 'pointer',
@@ -688,7 +719,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                                                 e.currentTarget.style.backgroundColor = 'transparent';
                                                             }}
                                                         >
-                                                            ${Number(user.balance || 0).toLocaleString()}
+                                                            ${Number(user.cards && user.cards.length > 0 ? user.cards[0].saldo : user.balance || 0).toLocaleString()}
                                                         </div>
                                                     )}
                                                 </TableCell>
@@ -875,6 +906,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                                                 setSelectedCardToView({
                                                                     cardNumber: card.cardNumber,
                                                                     holderName: card.userName,
+                                                                    expiryDate: card.expiryDate,
                                                                 });
                                                                 setViewCardModalOpen(true);
                                                             }}
@@ -1046,6 +1078,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                             <CiensPayCard
                                 holderName={selectedCardToView.holderName}
                                 cardNumber={selectedCardToView.cardNumber.match(/.{1,4}/g)?.join(' ') || selectedCardToView.cardNumber}
+                                expiryDate={selectedCardToView.expiryDate}
                                 isStatic={true}
                             />
                         </div>
