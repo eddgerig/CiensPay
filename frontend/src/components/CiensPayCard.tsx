@@ -16,17 +16,32 @@ interface CiensPayCardProps {
     isStatic?: boolean;
 }
 
-export function CiensPayCard({
-    holderName = "John Doe",
-    cardNumber = "5123 4567 8901 2345",
-    expiryDate = "12/26",
-    cvv = "123",
-    isStatic = false
-}: CiensPayCardProps) {
+export function CiensPayCard(props: CiensPayCardProps & { userData?: any }) {
     const [showCardDetails, setShowCardDetails] = useState(false);
     const [copiedCard, setCopiedCard] = useState(false);
+    const { userData, isStatic = false, holderName, cardNumber, expiryDate, cvv } = props;
+
+    // Prefer props, fallback to userData
+    const cardNum = cardNumber || userData?.cards?.[0]?.['numero_tarjeta'];
+    const cardHolder = holderName || userData?.user?.['full_name'];
+    const cardExpiry = expiryDate || userData?.cards?.[0]?.['fecha_vencimiento'];
+    const cardCvv = cvv || '•••'; // CVV might not be available in userData usually
+
+    // Función para formatear fecha
+    const formatDate = (dateString: string) => {
+        if (!dateString) return '••/••';
+        try {
+            const date = new Date(dateString);
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${month}/${day}`;
+        } catch (error) {
+            return '••/••';
+        }
+    };
 
     const handleCopyCard = () => {
+        const cardNumber = cardNum || '';
         navigator.clipboard.writeText(cardNumber.replace(/\s/g, ''));
         setCopiedCard(true);
         setTimeout(() => setCopiedCard(false), 2000);
@@ -119,7 +134,7 @@ export function CiensPayCard({
                 <div className="relative mb-5">
                     {showCardDetails || isStatic ? (
                         <div className="flex items-center gap-3">
-                            <p className="text-gray-400 text-lg tracking-[0.3em] font-mono">{cardNumber}</p>
+                            <p className="text-gray-400 text-lg tracking-[0.3em] font-mono">{cardNum || '•••• •••• •••• ••••'}</p>
                             {!isStatic && (
                                 <IconButton
                                     size="small"
@@ -131,7 +146,7 @@ export function CiensPayCard({
                             )}
                         </div>
                     ) : (
-                        <p className="text-gray-400 text-lg tracking-[0.3em] font-mono">•••• •••• •••• {cardNumber.slice(-4)}</p>
+                        <p className="text-gray-400 text-lg tracking-[0.3em] font-mono">•••• •••• •••• {cardNum?.slice(-4) || '••••'}</p>
                     )}
                 </div>
 
@@ -141,20 +156,20 @@ export function CiensPayCard({
                         {/* Valid thru */}
                         <div>
                             <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Valid Thru</p>
-                            <p className="text-gray-400 text-sm tracking-wider">{showCardDetails || isStatic ? expiryDate : '••/••'}</p>
+                            <p className="text-gray-400 text-sm tracking-wider">{showCardDetails || isStatic ? formatDate(cardExpiry) : '••/••'}</p>
                         </div>
 
                         {/* Cardholder name */}
                         <div>
                             <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Cardholder</p>
-                            <p className="text-gray-400 text-sm tracking-wider uppercase">{holderName}</p>
+                            <p className="text-gray-400 text-sm tracking-wider uppercase">{cardHolder}</p>
                         </div>
 
                         {/* CVV */}
-                        {showCardDetails && (
+                        {(showCardDetails || isStatic) && (
                             <div>
                                 <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">CVV</p>
-                                <p className="text-gray-400 text-sm tracking-wider">{cvv}</p>
+                                <p className="text-gray-400 text-sm tracking-wider">{cardCvv}</p>
                             </div>
                         )}
                     </div>

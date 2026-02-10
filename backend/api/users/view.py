@@ -89,3 +89,33 @@ def me_view(request):
         'user': UserSerializer(request.user).data
     })
 
+ 
+# Vistas de todos los Usuarios
+@api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
+def usuarios_list_all(request):
+    """Lista todos los usuarios o crea uno nuevo"""
+    if request.method == 'GET':
+        usuarios = User.objects.all()
+        serializer = UserSerializer(usuarios, many=True)
+        return Response({
+            'success': True,
+            'count': usuarios.count(),
+            'data': serializer.data
+        })
+    
+    elif request.method == 'POST':
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'success': True,
+                'message': 'Usuario creado exitosamente',
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)
+        
+        return Response({
+            'success': False,
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+

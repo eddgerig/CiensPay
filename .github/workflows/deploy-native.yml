@@ -19,7 +19,7 @@ jobs:
       - name: Install and Build
         working-directory: frontend
         run: |
-          npm install
+          npm ci
           npm run build
           
       - name: Deploy Frontend to EC2
@@ -56,6 +56,7 @@ jobs:
           source: "nginx/*"
           target: "/home/ubuntu/cienspay-config"
 
+          
       - name: SSH Remote Commands
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -65,18 +66,18 @@ jobs:
           script: |
             cd /home/ubuntu/cienspay-backend
             
-            # 1. Crear entorno virtual si no existe
+            # Crear venv si no existe
             if [ ! -d "venv" ]; then
               python3 -m venv venv
             fi
             
-            # 2. Instalar dependencias usando el pip del venv (Evita error PEP 668)
-            ./venv/bin/pip install --upgrade pip
-            ./venv/bin/pip install -r requirements.txt
+            # Activar venv e instalar deps
+            source venv/bin/activate
+            pip install -r requirements.txt
             
-            # 3. Ejecutar comandos de Django usando el python del venv
-            ./venv/bin/python manage.py migrate
-            ./venv/bin/python manage.py collectstatic --noinput
+            # Migraciones y Static Files
+            python manage.py migrate
+            python manage.py collectstatic --noinput
             
-            # 4. Reiniciar el servicio de Systemd (Asegúrate de que el nombre sea correcto)
+            # Reiniciar servicio
             sudo systemctl restart cienspay-backend

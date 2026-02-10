@@ -13,6 +13,7 @@ export interface RegisterFormData {
     email: string;
     password: string;
     confirmPassword: string;
+    balance?: string;
 }
 
 interface RegisterFormProps {
@@ -35,6 +36,7 @@ interface FormErrors {
     email?: string;
     password?: string;
     confirmPassword?: string;
+    balance?: string;
 }
 
 export function RegisterForm({ onBack, onRegisterSuccess, embedded = false, hidePassword = false, initialData, onSubmit, sx, submitLabel }: RegisterFormProps) {
@@ -53,6 +55,7 @@ export function RegisterForm({ onBack, onRegisterSuccess, embedded = false, hide
         email: initialData?.email || '',
         password: '',
         confirmPassword: '',
+        balance: initialData?.balance || '0.00',
     });
 
     useEffect(() => {
@@ -65,6 +68,7 @@ export function RegisterForm({ onBack, onRegisterSuccess, embedded = false, hide
                 lastName: initialData.lastName || '',
                 phone: initialData.phone || '',
                 email: initialData.email || '',
+                balance: initialData.balance || '0.00',
             }));
         }
     }, [initialData]);
@@ -130,6 +134,18 @@ export function RegisterForm({ onBack, onRegisterSuccess, embedded = false, hide
             hasErrors = true;
         }
 
+        // Balance (optional for edit mode)
+        if (formData.balance !== undefined && formData.balance !== '') {
+            const balanceNum = parseFloat(formData.balance);
+            if (isNaN(balanceNum)) {
+                newErrors.balance = 'Balance inválido';
+                hasErrors = true;
+            } else if (balanceNum < 0) {
+                newErrors.balance = 'El balance no puede ser negativo';
+                hasErrors = true;
+            }
+        }
+
         if (!hidePassword) {
             // Password
             if (!formData.password) {
@@ -157,67 +173,69 @@ export function RegisterForm({ onBack, onRegisterSuccess, embedded = false, hide
         return !hasErrors;
     };
 
-const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
 
-    if (!validateForm()) return;
+        if (!validateForm()) return;
 
-    if (onSubmit) {
-        onSubmit(formData);
-        return;
-    }
-
-    setIsLoading(true);
-
-    try {
-        const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-
-        // Backend actual espera: nombre, email, edad, password, password2
-        const payload = {
-        nombre: `${formData.firstName} ${formData.lastName}`.trim(),
-        email: formData.email.trim().toLowerCase(),
-        edad: 18, // <-- TEMPORAL: agrega campo "edad" en el form si lo quieres real
-        password: formData.password,
-        password2: formData.confirmPassword,
-        };
-
-        const res = await fetch(`${apiBase}/auth/register/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok || !data?.success) {
-        // El backend devuelve { success:false, errors:{...} }
-        const be = data?.errors || {};
-        const msg = data?.message || 'No se pudo registrar';
-
-        setErrors({
-            documentNumber: '', // backend no valida esto aún
-            firstName: be?.nombre?.[0] || '',
-            lastName: '', // backend no separa apellido
-            phone: '', // backend no valida esto aún
-            email: be?.email?.[0] || '',
-            password: be?.password?.[0] || be?.non_field_errors?.[0] || msg,
-            confirmPassword: be?.password2?.[0] || '',
-        });
-
-        setIsLoading(false);
-        return;
+        if (onSubmit) {
+            onSubmit(formData);
+            return;
         }
 
-        setIsLoading(false);
-        if (onRegisterSuccess) onRegisterSuccess();
-    } catch (err) {
-        setIsLoading(false);
-        setErrors((prev) => ({
-        ...prev,
-        password: 'Error de red: no se pudo conectar al servidor',
-        }));
-    }
-};
+        setIsLoading(true);
+
+        try {
+            const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+            // Backend actual espera: nombre, email, edad, password, password2
+            const payload = {
+                full_name: `${formData.firstName} ${formData.lastName}`.trim(),
+                email: formData.email.trim().toLowerCase(),
+                document_type: formData.documentType,
+                //edad: 18, // <-- TEMPORAL: agrega campo "edad" en el form si lo quieres real
+                password: formData.password,
+                password2: formData.confirmPassword,
+                document_number: formData.documentNumber,
+            };
+
+            const res = await fetch(`${apiBase}/auth/register/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || !data?.success) {
+                // El backend devuelve { success:false, errors:{...} }
+                const be = data?.errors || {};
+                const msg = data?.message || 'No se pudo registrar';
+
+                setErrors({
+                    documentNumber: '', // backend no valida esto aún
+                    firstName: be?.nombre?.[0] || '',
+                    lastName: '', // backend no separa apellido
+                    phone: '', // backend no valida esto aún
+                    email: be?.email?.[0] || '',
+                    password: be?.password?.[0] || be?.non_field_errors?.[0] || msg,
+                    confirmPassword: be?.password2?.[0] || '',
+                });
+
+                setIsLoading(false);
+                return;
+            }
+
+            setIsLoading(false);
+            if (onRegisterSuccess) onRegisterSuccess();
+        } catch (err) {
+            setIsLoading(false);
+            setErrors((prev) => ({
+                ...prev,
+                password: 'Error de red: no se pudo conectar al servidor',
+            }));
+        }
+    };
 
 
     const handleChange = (field: keyof RegisterFormData) => (
@@ -411,6 +429,29 @@ const handleSubmit = async (e: React.FormEvent) => {
                     sx={inputStyles}
                 />
             </div>
+
+            {/* Balance (only show in edit mode) */}
+            {initialData && (
+                <div className="grid md:grid-cols-2 gap-6">
+                    <TextField
+                        fullWidth
+                        label="Balance"
+                        value={formData.balance}
+                        onChange={handleChange('balance')}
+                        error={!!errors.balance}
+                        helperText={errors.balance || 'Balance disponible del usuario'}
+                        placeholder="0.00"
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <span style={{ color: '#d3ba30', fontSize: '16px', fontWeight: 'bold' }}>$</span>
+                                </InputAdornment>
+                            ),
+                        }}
+                        sx={inputStyles}
+                    />
+                </div>
+            )}
 
             {/* Passwords */}
             {!hidePassword && (
