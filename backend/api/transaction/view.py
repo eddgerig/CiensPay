@@ -8,6 +8,14 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password
 from rest_framework import generics
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+from api.users.models import User
+from api.card.models import Card
+from api.card.serializer import CardSerializer
+
 
 import json
 
@@ -35,6 +43,57 @@ class TransactionListAPIView(generics.ListAPIView):
     def transaction_list(self):
         # select_related hace el JOIN en la consulta SQL
         return Transaction.objects.select_related('card').all()
+    
+
+class UserCardsTransactionsAPIView(APIView):
+    """
+    API para obtener todas las tarjetas y transacciones de un usuario
+    """
+    
+    def get(self, request, user_id=None):
+        # Si no se proporciona user_id, usar el usuario autenticado
+        if not user_id and request.user.is_authenticated:
+            user_id = request.user.id
+        elif not user_id:
+            return Response(
+                {"error": "Se requiere user_id o usuario autenticado"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Verificar que el usuario exista
+        user = get_object_or_404(User, id=user_id)
+        
+        # Obtener todas las tarjetas del usuario
+        cards = Card.objects.filter(user=user_id).select_related('user')
+        
+        # Obtener todas las transacciones de las tarjetas del usuario
+        card_ids = cards.values_list('id', flat=True)
+        transactions = Transaction.objects.filter(
+            card_id__in=card_ids
+        ).select_related('card').order_by('-fecha_operacion')
+        
+        # Serializar los datos
+        cards_data = CardSerializer(cards, many=True).data
+        transactions_data = TransactionSerializer(transactions, many=True).data
+        
+        # Estructurar la respuesta
+        response_data = {
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "full_name": user.full_name
+            },
+            "cards": cards_data,
+            "transactions": transactions_data,
+            "summary": {
+                "total_cards": cards.count(),
+                "total_transactions": transactions.count(),
+                "total_balance": sum(card.saldo for card in cards if card.activo)
+            }
+        }
+        
+        return Response(response_data, status=status.HTTP_200_OK)
     
     """elif request.method == 'POST':
         serializer = RegisterSerializer(data=request.data)

@@ -26,7 +26,7 @@ from django.urls import path
 from django.http import JsonResponse  # Agrega esta línea
 from api.users.view import user_list, login_view, me_view, usuarios_list_all
 ##from api.transaction.view import transaction_list
-from api.transaction.view import TransactionListAPIView
+from api.transaction.view import TransactionListAPIView, UserCardsTransactionsAPIView
 from api.card.views import generate_card, list_cards, get_user_cards, toggle_card_status
 
 
@@ -117,4 +117,5 @@ urlpatterns = [
     path("api/admin/users-cards/", admin_users_cards, name="admin-users-cards"),
     path("api/admin/users-cards/", admin_users_cards, name="admin-users-cards"),
     path("api/admin/users/<int:pk>/", admin_user_detail, name="admin-user-detail"),
+    path('api/user/<int:user_id>/financial-data/', UserCardsTransactionsAPIView.as_view(), name='user-financial-data'),
 ]
