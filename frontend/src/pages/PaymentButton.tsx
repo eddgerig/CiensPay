@@ -20,6 +20,9 @@ import {
     ShoppingCart,
 } from 'lucide-react';
 
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '').replace(/\/api$/, '');
+
+
 export function PaymentButton() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -77,7 +80,7 @@ export function PaymentButton() {
         setLoading(true);
 
         try {
-            const response = await fetch('http://localhost:8000/api/transactions/simulate/', {
+            const response = await fetch(`${API_URL}/api/transactions/simulate/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
