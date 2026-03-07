@@ -27,7 +27,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
                 try {
                     console.log('Obteniendo datos para el usuario:', JSON.parse(storedValue));
                     const userId = JSON.parse(storedValue).id; // Asegúrate de que el formato del valor almacenado es correcto
-                    const response = await fetch(`http://localhost:8000/api/user/${userId}/financial-data/`);
+                    const response = await fetch(`${API_URL}/api/user/${userId}/financial-data/`);
 
                     if (!response.ok) {
                         throw new Error('Error al obtener los datos del usuario');
