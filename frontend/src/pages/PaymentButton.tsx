@@ -78,7 +78,7 @@ export function PaymentButton() {
         setLoading(true);
 
         try {
-            const response = await fetch('${API_URL}/api/transactions/simulate/', {
+            const response = await fetch(`${API_URL}/api/transactions/simulate/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
