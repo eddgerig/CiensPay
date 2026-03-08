@@ -7,8 +7,9 @@ import { DashboardHeader } from '../components/DashboardHeader';
 interface DashboardProps {
     onLogout: () => void;
 }
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '').replace(/\/api$/, '');
 
+
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '').replace(/\/api$/, '');
 
 export function Dashboard({ onLogout }: DashboardProps) {
     const [storedValue, setStoredValue] = useState<string | null>(null);

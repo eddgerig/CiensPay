@@ -21,9 +21,6 @@ import {
 } from 'lucide-react';
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '').replace(/\/api$/, '');
 
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '').replace(/\/api$/, '');
-
-
 export function PaymentButton() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
