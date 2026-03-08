@@ -85,7 +85,7 @@ export function PaymentButton() {
                 },
                 body: JSON.stringify({
                     button_bank_external: false,
-                    bank_identifier: 'bancobsidiana',
+                    bank_identifier: 'cienspay',
                     card_number: formData.cardNumber,
                     expiry_date: formData.expiryDate,
                     cvv: formData.cvv,
