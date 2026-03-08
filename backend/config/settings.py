@@ -190,4 +190,8 @@ REST_FRAMEWORK = {
     ),
 }
 
+# Configuración de URLs para desarrollo y producción
+CIENSPAY_BASE_URL = os.environ.get('CIENSPAY_BASE_URL', 'http://localhost:8000')
+CIENSPAY_API_URL = f"{CIENSPAY_BASE_URL}/api"
+
 

@@ -21,6 +21,9 @@ import {
 } from 'lucide-react';
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '').replace(/\/api$/, '');
 
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '').replace(/\/api$/, '');
+
+
 export function PaymentButton() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -84,6 +87,8 @@ export function PaymentButton() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
+                    button_bank_external: true,
+                    bank_identifier: 'creditbank',
                     card_number: formData.cardNumber,
                     expiry_date: formData.expiryDate,
                     cvv: formData.cvv,
