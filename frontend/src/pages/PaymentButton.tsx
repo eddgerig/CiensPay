@@ -86,6 +86,8 @@ export function PaymentButton() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
+                    button_bank_external: true,
+                    bank_identifier: 'creditbank',
                     card_number: formData.cardNumber,
                     expiry_date: formData.expiryDate,
                     cvv: formData.cvv,
