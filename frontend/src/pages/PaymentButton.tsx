@@ -84,7 +84,7 @@ export function PaymentButton() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    button_bank_external: true,
+                    button_bank_external: false,
                     bank_identifier: 'bancobsidiana',
                     card_number: formData.cardNumber,
                     expiry_date: formData.expiryDate,
