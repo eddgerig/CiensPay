@@ -7,3 +7,4 @@ python-dotenv==1.0.0
 gunicorn
 django-cors-headers
 drf-yasg>=1.21.7
+requests==2.31.0
