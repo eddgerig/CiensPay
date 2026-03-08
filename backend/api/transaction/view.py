@@ -139,7 +139,7 @@ class SimulatePaymentAPIView(APIView):
             if bank_identifier in [ 'cienspay', '4651', 'grupo2']:
                 return Response({'error': 'Tarjeta no encontrada'}, status=status.HTTP_404_NOT_FOUND)
 
-        if bank_identifier in [ 'cienspay', '4651', 'grupo2']:
+        if button_bank_external == True  or (button_bank_external == False and bank_identifier in [ 'cienspay', '4651', 'grupo2']):
                     
             if not card.activo:
                 return Response({'error': 'La tarjeta no está activa'}, status=status.HTTP_400_BAD_REQUEST)
