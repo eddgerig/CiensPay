@@ -287,7 +287,7 @@ class SimulatePaymentAPIView(APIView):
                         descripcion=description,
                         exitoso=True
                     )
-                    url = f"{settings.CIENSPAY_API_URL}/cards/10/balance/"
+                    url = f"{settings.CIENSPAY_API_URL}/cards/14/balance/"
                     
                     payload = {
                         "balance":amount ,
