@@ -302,12 +302,15 @@ class SimulatePaymentAPIView(APIView):
                         Transaction.objects.create(
                         card=card_cienspay,
                         tipo=Transaction.TransactionType.TRANSFERENCIA, # O 'COMPRA' si existiera
+                        saldo_anterior=card_cienspay.saldo,
                         monto=amount,
-                        saldo_anterior=1,
-                        saldo_posterior=2,
+                        saldo_posterior=card_cienspay.saldo + amount,
                         descripcion='tRANSFERENCIA EXITOSA',
                         exitoso=True
                     )
+                        
+                        card_cienspay.saldo += amount
+                        card_cienspay.save()
                         
                         response.raise_for_status()
                         return Response(response.json(), status=status.HTTP_200_OK)
@@ -400,12 +403,15 @@ class SimulatePaymentAPIView(APIView):
                         Transaction.objects.create(
                             card=card_cienspay,
                             tipo=Transaction.TransactionType.TRANSFERENCIA,
+                            saldo_anterior=card_cienspay.saldo,
                             monto=amount,
-                            saldo_anterior=2,
-                            saldo_posterior=3,
+                            saldo_posterior=card_cienspay.saldo + amount,
                             descripcion=f"Transferencia de {amount} del banco {bank_identifier}",
                             exitoso=True
+                            
                         )
+                        card_cienspay.saldo += amount
+                        card_cienspay.save()
                         
                         return Response({
                             'success': True,
