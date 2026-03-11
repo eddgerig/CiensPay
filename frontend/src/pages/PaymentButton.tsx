@@ -9,6 +9,12 @@ import {
     Snackbar,
     Alert,
     CircularProgress,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    Switch,
+    FormControlLabel,
 
 } from '@mui/material';
 import {
@@ -29,14 +35,16 @@ export function PaymentButton() {
         expiryDate: '',
         cvv: '',
         amount: '',
+        button_bank_external: true,
+        bank_identifier: 'bancobsidiana',
     });
 
-    const handleInputChange = (field: string, value: string) => {
+    const handleInputChange = (field: string, value: string | boolean) => {
         let formattedValue = value;
 
         // Format card number with spaces every 4 digits
         if (field === 'cardNumber') {
-            formattedValue = value
+            formattedValue = (value as string)
                 .replace(/\s/g, '')
                 .replace(/(\d{4})/g, '$1 ')
                 .trim()
@@ -45,7 +53,7 @@ export function PaymentButton() {
 
         // Format expiry date as MM/YY
         if (field === 'expiryDate') {
-            formattedValue = value
+            formattedValue = (value as string)
                 .replace(/\D/g, '')
                 .replace(/(\d{2})(\d{0,2})/, '$1/$2')
                 .slice(0, 5);
@@ -53,12 +61,12 @@ export function PaymentButton() {
 
         // Limit CVV to 3 digits
         if (field === 'cvv') {
-            formattedValue = value.replace(/\D/g, '').slice(0, 3);
+            formattedValue = (value as string).replace(/\D/g, '').slice(0, 3);
         }
 
         // Format amount with decimal
         if (field === 'amount') {
-            formattedValue = value.replace(/[^\d.]/g, '');
+            formattedValue = (value as string).replace(/[^\d.]/g, '');
         }
 
         setFormData({ ...formData, [field]: formattedValue });
@@ -84,8 +92,8 @@ export function PaymentButton() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    button_bank_external: false,
-                    bank_identifier: 'cienspay',
+                    button_bank_external: formData.button_bank_external,
+                    bank_identifier: formData.bank_identifier,
                     card_number: formData.cardNumber,
                     expiry_date: formData.expiryDate,
                     cvv: formData.cvv,
@@ -109,6 +117,8 @@ export function PaymentButton() {
                     expiryDate: '',
                     cvv: '',
                     amount: '',
+                    button_bank_external: true,
+                    bank_identifier: 'bancobsidiana',
                 });
             } else {
                 setSnackbar({
@@ -214,6 +224,74 @@ export function PaymentButton() {
                                 </div>
 
                                 <form onSubmit={handlePayment} className="space-y-4">
+                                    {/* Banco Externo Switch */}
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                checked={formData.button_bank_external}
+                                                onChange={(e) => handleInputChange('button_bank_external', e.target.checked)}
+                                                color="warning"
+                                            />
+                                        }
+                                        label="Banco Externo"
+                                        sx={{
+                                            '& .MuiFormControlLabel-label': {
+                                                color: 'rgba(255, 255, 255, 0.8)',
+                                            },
+                                            marginBottom: '16px',
+                                        }}
+                                    />
+
+                                    {/* Bank Identifier Select */}
+                                    <FormControl fullWidth sx={{ marginBottom: '20px' }}>
+                                        <InputLabel 
+                                            id="bank-identifier-label"
+                                            sx={{
+                                                color: 'rgba(255, 255, 255, 0.6)',
+                                                '&.Mui-focused': {
+                                                    color: '#d3ba30',
+                                                },
+                                            }}
+                                        >
+                                            Banco
+                                        </InputLabel>
+                                        <Select
+                                            labelId="bank-identifier-label"
+                                            value={formData.bank_identifier}
+                                            onChange={(e) => handleInputChange('bank_identifier', e.target.value)}
+                                            label="Banco"
+                                            sx={{
+                                                color: '#fff',
+                                                '& .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: 'rgba(211, 186, 48, 0.3)',
+                                                },
+                                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: 'rgba(211, 186, 48, 0.5)',
+                                                },
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#d3ba30',
+                                                },
+                                                '& .MuiSvgIcon-root': {
+                                                    color: '#d3ba30',
+                                                },
+                                                '& .MuiInputLabel-root': {
+                                                    color: 'rgba(255, 255, 255, 0.6)',
+                                                },
+                                                '& .MuiInputLabel-root.Mui-focused': {
+                                                    color: '#d3ba30',
+                                                },
+                                            }}
+                                        >
+                                            <MenuItem value="cienspay">CiensPay</MenuItem>
+                                            <MenuItem value="4651">4651</MenuItem>
+                                            <MenuItem value="grupo2">Grupo 2</MenuItem>
+                                            <MenuItem value="creditbank">CreditBank</MenuItem>
+                                            <MenuItem value="grupo3">Grupo 3</MenuItem>
+                                            <MenuItem value="bancobsidiana">Banco Sidiana</MenuItem>
+                                            <MenuItem value="grupo5">Grupo 5</MenuItem>
+                                        </Select>
+                                    </FormControl>
+
                                     {/* Amount */}
                                     <TextField
                                         label="Monto"
