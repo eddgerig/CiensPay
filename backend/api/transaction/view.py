@@ -193,6 +193,12 @@ class SimulatePaymentAPIView(APIView):
 
                     
                 if bank_identifier in ['creditbank', 'grupo3']:
+                    
+                    return Response({
+                        'success': True, 
+                        'message': 'grupo3 - CreditBank',
+                        'new_balance': card.saldo
+                    }, status=status.HTTP_200_OK)
                     url = 'https://core-banking-service-6pup.onrender.com/external/transfer-in'
                     
                     payload = {
