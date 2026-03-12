@@ -136,11 +136,11 @@ class SimulatePaymentAPIView(APIView):
         try:
             card = Card.objects.get(numero_tarjeta=card_number.replace(" ", ""))
         except Card.DoesNotExist:
-            if bank_identifier in [ 'cienspay', '4651', 'grupo2']:
+            if bank_identifier in [ 'cienspay', '4651', 'grupo2'] or button_bank_external == True:
                 return Response({'error': 'Tarjeta no encontrada'}, status=status.HTTP_404_NOT_FOUND)
 
         if button_bank_external == True  or (button_bank_external == False and bank_identifier in [ 'cienspay', '4651', 'grupo2']):
-                    
+           
             if not card.activo:
                 return Response({'error': 'La tarjeta no está activa'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -231,7 +231,13 @@ class SimulatePaymentAPIView(APIView):
                             'error': f'Error en comunicación bancaria: {str(e)}'
                         }, status=status.HTTP_502_BAD_GATEWAY)
                 elif bank_identifier in [ 'grupo5' , 'bancobsidiana']:
-                    url = 'https://ecommerce-bancobsidiana-team5-production.up.railway.app/api/v1/transaction/process'
+                    return Response({
+                        'success': True, 
+                        'message': 'grupo5 - bancobsidiana',
+                        'new_balance': card.saldo
+                    }, status=status.HTTP_200_OK)
+                    url = 'https://bancobsidiana.up.railway.app/api/v1/transaction/process'
+                    #url = 'https://ecommerce-bancobsidiana-team5-production.up.railway.app/api/v1/transaction/process'
                     
                     payload = {
                          "card_number": card_number,
@@ -338,15 +344,15 @@ class SimulatePaymentAPIView(APIView):
 
                 elif bank_identifier in ['creditbank', 'grupo3']:
                     # Lógica para CreditBank/Grupo3
-                    url = 'https://core-banking-service-6pup.onrender.com/external/transfer-in'
+                    url = 'https://core-banking-service-6pup.onrender.com/api/external/verify-and-charge'
                     
                     payload = {
+                        "card_number": card_number,
+                        "expiry_date": expiry_date,
+                        "cvv": cvv,
                         "amount": amount,
-                        "target_account_number": "1234567890",
-                        "external_bank_name": f"{bank_identifier} cienspay",
-                        "external_card_number": card_number
-                    }
-
+                        "description": description
+                        }
                     print(f"Enviando a API CreditBank: {url}")
                     print(f"Payload: {payload}")
                     
@@ -357,16 +363,23 @@ class SimulatePaymentAPIView(APIView):
                         
                         response.raise_for_status()
                         
-                        # Si la respuesta es exitosa, crear la transacción local
+                        card_cienspay = Card.objects.get(numero_tarjeta= '4651001855562775')
                         Transaction.objects.create(
-                            card=card,
-                            tipo=Transaction.TransactionType.RETIRO,
-                            monto=amount,
-                            saldo_anterior=saldo_anterior,
-                            saldo_posterior=card.saldo,
-                            descripcion=f"Transferencia a {bank_identifier}",
-                            exitoso=True
+                        card=card_cienspay,
+                        tipo=Transaction.TransactionType.TRANSFERENCIA, # O 'COMPRA' si existiera
+                        saldo_anterior=card_cienspay.saldo,
+                        monto=amount,
+                        saldo_posterior=card_cienspay.saldo + amount,
+                        descripcion='TRANSFERENCIA EXITOSA',
+                        exitoso=True
                         )
+                        
+                        card_cienspay.saldo += amount
+                        card_cienspay.save()
+                        
+                        response.raise_for_status()
+                        return Response(response.json(), status=status.HTTP_200_OK)
+
                         
                         return Response({
                             'success': True,
@@ -383,8 +396,9 @@ class SimulatePaymentAPIView(APIView):
 
                 elif bank_identifier in [ 'grupo5' , 'bancobsidiana']:
                     # Lógica para CreditBank/Grupo3
-                    url = 'https://ecommerce-bancobsidiana-team5-production.up.railway.app/api/v1/transaction/process'
-                    
+                    url = 'https://bancobsidiana.up.railway.app/api/v1/transaction/process'
+                    #url = 'https://ecommerce-bancobsidiana-team5-production.up.railway.app/api/v1/transaction/process'
+
                     payload = {
                         "card_number": card_number,
                         "expiry": expiry_date,
